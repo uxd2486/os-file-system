@@ -16,6 +16,8 @@
 ** used in either C or assembly-language source code.
 */
 
+#define NUM_BLOCKS 10
+
 #ifndef SP_ASM_SRC
 
 /*
@@ -28,14 +30,35 @@
 /*
 ** Types
 */
+typedef struct i_node {
+    int id,
+    int num_dir,
+    int *blocks,
+    int indirect_block
+} File;
+
+typedef struct file_map {
+    int file_id,
+    int block_id
+} FileMap;
 
 /*
 ** Globals
 */
+static FileMap *file_to_block;
+static int file_count;
 
 /*
 ** Prototypes
 */
+
+File open_file( int id );
+
+int close_file( File file );
+
+int read_file( File file, char *buf);
+
+int write_file( File file, char *buf, int buf_size );
 
 #endif
 /* SP_ASM_SRC */

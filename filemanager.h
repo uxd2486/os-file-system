@@ -28,14 +28,34 @@
 /*
 ** Types
 */
+typedef struct dir_node {
+    int id,
+    char *name,
+    int parent_id,
+    int *files,
+    int num_files,
+    Directory *children,
+    int num_children
+} Directory;
 
 /*
 ** Globals
 */
+Directory *directory_tree;
 
 /*
 ** Prototypes
 */
+
+int create_file( char *filename, int current_dir );
+
+int delete_file( char *filename, int current_dir );
+
+int create_directory( char *dir_name, int current_dir );
+
+int delete_directory( char *dir_name, int current_dir );
+
+int change_directory( char *dir_name, int current_dir );
 
 #endif
 /* SP_ASM_SRC */
