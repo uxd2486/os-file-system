@@ -38,14 +38,20 @@ typedef struct dir_node {
     int num_children
 } Directory;
 
+struct str_to_int {
+    char *name,
+    int id
+} StrIntMap;
+
 /*
 ** Globals
 */
-Directory *directory_tree;
 
 /*
 ** Prototypes
 */
+
+void init_filesystem();
 
 int create_file( char *filename, int current_dir );
 

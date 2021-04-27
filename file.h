@@ -32,7 +32,6 @@
 */
 typedef struct i_node {
     int id,
-    int num_dir,
     int *blocks,
     int indirect_block
 } File;
@@ -51,6 +50,11 @@ static int file_count;
 /*
 ** Prototypes
 */
+
+/*
+** makes a new file, saves it, returns the id
+*/
+int create_file( void );
 
 File open_file( int id );
 
