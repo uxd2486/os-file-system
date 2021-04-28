@@ -22,6 +22,8 @@
 /*
 ** PRIVATE GLOBAL VARIABLES
 */
+static FileMap *file_to_block;
+static int file_count;
 
 /*
 ** PUBLIC GLOBAL VARIABLES
@@ -34,6 +36,18 @@
 /*
 ** PUBLIC FUNCTIONS
 */
+int create_file( int id ){
+    File *file; // TODO malloc properly
+    file->id = id;
+    for( int i = 0; i < NUM_BLOCKS; i++ ){
+        // get a block and save its id in the blocks list
+    }
+    // set the indirect block here
+
+    // add to file_to_block
+
+    return SUCCESS;
+}
 
 /**
 ** Name:  ?

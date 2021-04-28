@@ -44,21 +44,19 @@ typedef struct file_map {
 /*
 ** Globals
 */
-static FileMap *file_to_block;
-static int file_count;
 
 /*
 ** Prototypes
 */
 
 /*
-** makes a new file, saves it, returns the id
+** makes a new file, saves it
 */
-int create_file( void );
+int create_file( int id );
 
-File open_file( int id );
+File *open_file( int id );
 
-int close_file( File file );
+int close_file( File *file );
 
 int read_file( File file, char *buf);
 

@@ -18,6 +18,8 @@
 ** PRIVATE DEFINITIONS
 */
 #define ROOT_ID 0
+#define PARENT_DIR_STRING ".."
+
 /*
 ** PRIVATE DATA TYPES
 */
@@ -25,6 +27,7 @@
 /*
 ** PRIVATE GLOBAL VARIABLES
 */
+static int file_id_assigner;
 static Directory *directory_tree;
 static StrIntMap *file_name_map;
 static file_count;
@@ -87,6 +90,9 @@ void init_filesystem(){
 
     // put in the tree
     directory_tree = root;
+
+    // start at 0
+    file_id_assigner = 0;
 }
 
 int create_file( char *filename, int current_dir ){
@@ -106,7 +112,8 @@ int create_file( char *filename, int current_dir ){
     }
 
     // make file in storage first
-    int file_id = make_file();
+    int file_id = create_file( file_id_assigner );
+    file_id_assigner++;
     // TODO check return
 
     // add file to filename list
@@ -121,9 +128,6 @@ int create_file( char *filename, int current_dir ){
     return SUCCESS;
 }
 
-void init_filesystem(){
-    
-}
 
 /**
 ** Name:  ?
