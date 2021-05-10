@@ -28,15 +28,6 @@
 /*
 ** Types
 */
-typedef struct dir_node {
-    int id,
-    char *name,
-    int parent_id,
-    int *files,
-    int num_files,
-    Directory *children,
-    int num_children
-} Directory;
 
 struct str_to_int {
     char *name,
@@ -53,15 +44,9 @@ struct str_to_int {
 
 void init_filesystem();
 
-int create_file( char *filename, int current_dir );
+int create_file( char *filename );
 
-int delete_file( char *filename, int current_dir );
-
-int create_directory( char *dir_name, int current_dir );
-
-int delete_directory( char *dir_name, int current_dir );
-
-int change_directory( char *dir_name, int current_dir );
+int delete_file( char *filename );
 
 #endif
 /* SP_ASM_SRC */

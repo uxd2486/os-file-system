@@ -49,6 +49,8 @@ typedef struct block_node {
 ** Prototypes
 */
 
+int init_blocks();
+
 Block load_block( int id );
 
 int save_block( Block block );

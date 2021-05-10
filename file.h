@@ -16,7 +16,7 @@
 ** used in either C or assembly-language source code.
 */
 
-#define NUM_BLOCKS 10
+#define NUM_BLOCKS 8
 
 #ifndef SP_ASM_SRC
 
@@ -33,7 +33,6 @@
 typedef struct i_node {
     int id,
     int *blocks,
-    int indirect_block
 } File;
 
 typedef struct file_map {
