@@ -35,11 +35,6 @@ typedef struct i_node {
     int *blocks,
 } File;
 
-typedef struct file_map {
-    int file_id,
-    int block_id
-} FileMap;
-
 /*
 ** Globals
 */
@@ -54,6 +49,8 @@ typedef struct file_map {
 int create_file( int id );
 
 File *open_file( int id );
+
+int delete_file( int id );
 
 int close_file( File *file );
 

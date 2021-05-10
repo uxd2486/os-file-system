@@ -30,9 +30,9 @@
 */
 
 struct str_to_int {
-    char *name,
+    char name[16],
     int id
-} StrIntMap;
+} file_map;
 
 /*
 ** Globals
@@ -42,11 +42,19 @@ struct str_to_int {
 ** Prototypes
 */
 
-void init_filesystem();
+void _fs_init();
 
 int create_file( char *filename );
 
 int delete_file( char *filename );
+
+int open_file( char *filename );
+
+int close_file( char *filename );
+
+int read_file( char *filename, char *buf, int buf_size);
+
+int write_file( char *filename, char *buf, int buf_size );
 
 #endif
 /* SP_ASM_SRC */

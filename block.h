@@ -17,7 +17,7 @@
 ** This section of the header file contains definitions that can be
 ** used in either C or assembly-language source code.
 */
-#define NUM_PAGES 3
+#define BLOCK_SIZE 1024
 
 #ifndef SP_ASM_SRC
 
@@ -49,7 +49,7 @@ typedef struct block_node {
 ** Prototypes
 */
 
-int init_blocks();
+int _blk_init();
 
 Block load_block( int id );
 
