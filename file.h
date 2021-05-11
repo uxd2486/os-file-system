@@ -19,7 +19,6 @@
 #define NUM_BLOCKS 8
 
 #ifndef SP_ASM_SRC
-
 /*
 ** Start of C-only definitions
 **
@@ -31,8 +30,9 @@
 ** Types
 */
 typedef struct i_node {
-    int id,
-    int *blocks,
+    int id;
+    int bytes_written;
+    int blocks[NUM_BLOCKS];
 } File;
 
 /*
@@ -54,9 +54,9 @@ int delete_file( int id );
 
 int close_file( File *file );
 
-int read_file( File file, char *buf);
+int read_file( File *file, char *buf);
 
-int write_file( File file, char *buf, int buf_size );
+int write_file( File *file, char *buf, int buf_size );
 
 #endif
 /* SP_ASM_SRC */

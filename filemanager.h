@@ -29,9 +29,9 @@
 ** Types
 */
 
-struct str_to_int {
-    char name[16],
-    int id
+typedef struct str_to_int {
+    char name[16];
+    int id;
 } file_map;
 
 /*
