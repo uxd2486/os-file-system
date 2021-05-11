@@ -18,6 +18,7 @@
 ** used in either C or assembly-language source code.
 */
 #define BLOCK_SIZE 1024
+#define NUM_SECTORS 2
 
 #ifndef SP_ASM_SRC
 
@@ -31,14 +32,11 @@
 /*
 ** Types
 */
-typedef union block_container {
-    
-} block_contents;
-
 typedef struct block_node {
-    int id,
-    int indirect,
-    block_contents *contents
+    int id;
+    HDD_DEVICE device;
+    uint32_t startl;
+    uint32_t starth;
 } Block;
 
 /*
@@ -51,9 +49,17 @@ typedef struct block_node {
 
 int _blk_init();
 
-Block load_block( int id );
+int alloc_blocks( int num );
 
-int save_block( Block block );
+int free_block( int id );
+
+int load_file( int id, File *file );
+
+int save_file( int id, File *file );
+
+int load_block( int id );
+
+int save_block( int id, void *contents );
 
 #endif
 /* SP_ASM_SRC */

@@ -62,6 +62,9 @@ void _fs_init(){
 
     open_files = ( (File *) * ) _km_page_alloc( 2 );
     open_files_count = 0;
+
+    // call the file init
+    _fl_init();
 }
 
 int create_file( char *filename ){

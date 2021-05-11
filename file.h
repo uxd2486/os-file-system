@@ -31,7 +31,7 @@
 */
 typedef struct i_node {
     int id;
-    int bytes_written;
+    int bytes; // number of bytes written already
     int blocks[NUM_BLOCKS];
 } File;
 
@@ -42,6 +42,8 @@ typedef struct i_node {
 /*
 ** Prototypes
 */
+
+void _fl_init();
 
 /*
 ** makes a new file, saves it

@@ -36,15 +36,37 @@ static int file_count;
 /*
 ** PUBLIC FUNCTIONS
 */
-int create_file( int id ){
-    File *file; // TODO malloc properly
-    file->id = id;
-    for( int i = 0; i < NUM_BLOCKS; i++ ){
-        // get a block and save its id in the blocks list
-    }
-    // set the indirect block here
+void _fl_init(){
+    // Initilize the globals
+    file_to_block = ( FileMap * ) _km_alloc_page( 2 );
+    file_count = 0;
 
-    // add to file_to_block
+    // call the block init
+    _blk_init();
+}
+
+
+int create_file( int id ){
+
+    // initialize file
+    File *file = ( File * ) _km_slice_alloc( 1 );
+    file->id = id;
+    file->bytes = 0;
+    // TODO allocate blocks and save ids
+
+    // alloc block to store i-node
+    int file_block = alloc_block();
+    file_to_block[file_count] = file_block;
+    file_count++;
+
+    // save i-node to disk
+    int result = save_file( file, file_block );
+    if ( result < 0 ){
+        return E_FAILURE; // something went wrong
+    }
+
+    // free memory
+    _km_slice_free( file );
 
     return SUCCESS;
 }
