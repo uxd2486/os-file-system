@@ -63,10 +63,10 @@ int create_file( int id ){
     File *file = ( File * ) _km_slice_alloc( 1 );
     file->id = id;
     file->bytes = 0;
-    // TODO allocate blocks and save ids
+    file->block = alloc_blocks( NUM_BLOCKS );
 
     // alloc block to store i-node
-    int file_block = alloc_block();
+    int file_block = alloc_blocks( 1 );
     file_to_block[file_count] = file_block;
     file_count++;
 
@@ -104,9 +104,18 @@ int delete_file( int id ){
         return E_FAILURE; // file i-node not found
     }
 
-    // TODO free the file i-node block
+    // TODO load the file i-node from disk
 
-    // TODO free file blocks
+    // free file blocks
+    int start_block = file->block;
+    for( int i = 0; i < NUM_BLOCKS; i++ ){
+        free_block( start_block + i );
+    }
+
+    // free the file i-node block
+    free_block( block_id );
+
+    return SUCCESS;
 }
 
 int close_file( File *file ){
