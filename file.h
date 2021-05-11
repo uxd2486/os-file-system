@@ -35,6 +35,11 @@ typedef struct i_node {
     int blocks[NUM_BLOCKS];
 } File;
 
+typedef struct file_block {
+    int file_id;
+    int block_id;
+} file_map;
+
 /*
 ** Globals
 */

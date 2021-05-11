@@ -22,7 +22,7 @@
 /*
 ** PRIVATE GLOBAL VARIABLES
 */
-static FileMap *file_to_block;
+static file_map *file_to_block;
 static int file_count;
 
 /*
@@ -32,6 +32,17 @@ static int file_count;
 /*
 ** PRIVATE FUNCTIONS
 */
+int get_block_id( int file_id ){
+    
+    int block_id = -1;
+    for ( int i = 0; i < file_count; i++ ){
+        if ( file_to_block[i]->file_id == file_id ){
+	    block_id = file_to_block[i]->block_id;
+	    break;
+	}
+    }
+    return block_id;
+}
 
 /*
 ** PUBLIC FUNCTIONS
@@ -69,6 +80,43 @@ int create_file( int id ){
     _km_slice_free( file );
 
     return SUCCESS;
+}
+
+File *open_file( int id ){
+    
+    // get the block the i-node is in
+    int block_id = get_block_id( id );
+    if ( block_id == -1 ){
+        return E_FAILURE; // file i-node not found
+    }
+
+    File *file = NULL;
+    // TODO load the file i-node from disk
+
+    return file;
+}
+
+int delete_file( int id ){
+    
+    // get the block that the i-node is in
+    int block_id = get_block_id( id );
+    if ( block_id == -1 ){
+        return E_FAILURE; // file i-node not found
+    }
+
+    // TODO free the file i-node block
+
+    // TODO free file blocks
+}
+
+int close_file( File *file ){
+    
+    int block_id = get_block_id( file->id );
+    if ( block_id == -1 ){
+        return E_FAILURE; // file i-node not found
+    }
+
+    // TODO write the file i-node to the disk
 }
 
 /**
