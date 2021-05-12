@@ -655,6 +655,12 @@ void _sys_init( void ) {
     _syscalls[ SYS_sleep ]    = _sys_sleep;
     _syscalls[ SYS_spawn ]    = _sys_spawn;
     _syscalls[ SYS_wait ]     = _sys_wait;
+    _syscalls[ SYS_fcreate ]  = _sys_fcreate;
+    _syscalls[ SYS_fdelete ]  = _sys_fdelete;
+    _syscalls[ SYS_fopen ]    = _sys_fopen;
+    _syscalls[ SYS_fclose ]   = _sys_fclose;
+    _syscalls[ SYS_fread ]    = _sys_fread;
+    _syscalls[ SYS_fwrite ]   = _sys_fwrite;
 
     // install the second-stage ISR
     __install_isr( INT_VEC_SYSCALL, _sys_isr );

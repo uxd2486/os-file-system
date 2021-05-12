@@ -98,6 +98,9 @@ int get_file_id( char *file_name ){
 ** Initializes the file system
 */
 void _fs_init(){
+
+    __cio_printf(" Filesystem:");
+
     // start at 0
     file_id_assigner = 0;
 
@@ -111,6 +114,8 @@ void _fs_init(){
 
     // call the file init
     _fl_init();
+
+   __cio_printf(" done");
 }
 
 /**
