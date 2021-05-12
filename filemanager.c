@@ -251,7 +251,8 @@ int _fs_read( char *filename, char *buf ){
         return E_FAILURE; //something went wrong
     }
 
-    return SUCCESS;
+    // return the number of characters read
+    return result;
 }
 
 int _fs_write( char *filename, char *buf, int buf_size ){

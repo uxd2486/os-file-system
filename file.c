@@ -186,7 +186,8 @@ int _fl_read( file_t *file, char *buf){
     // nul-terminate buffer so it can be a string
     buf[file->bytes] = '\0';
 
-    return SUCCESS;
+    // return the number of characters read (includes NULL-terminator)
+    return file->bytes + 1;
 }
 
 int _fl_write( file_t *file, char *buf, int buf_size ){

@@ -186,6 +186,52 @@ static void _sys_fclose( uint32_t args[4] ) {
 }
 
 /**
+** _sys_fread - read from a file
+**
+** implements:
+**    int fread( char *filename, char *buf );
+*/
+static void _sys_fread( uint32_t args[4] ) {
+
+    // first argument is the file name
+    char *filename = ( char *) args[0];
+
+    // second argument is the buffer to store file contents in
+    char *buf = ( char * ) args[1];
+
+    // call the function in filemanager
+    int size = _fs_read( filename, buf );
+
+    // return the number of characters read
+    // includes the NULL terminator
+    RET(_current) = size;
+}
+
+/**
+** _sys_fwrite - write to a file
+**
+** implements:
+**    int fwrite( char *filename, char *buf, int size );
+*/
+static void _sys_fwrite( uint32_t args[4] ) {
+
+    // first argument is the file name
+    char *filename = ( char *) args[0];
+
+    // second argument is the string to be written
+    char *buf = ( char * ) args[1];
+
+    // third argument is length of the string(not including NULL-terminator)
+    int32_t size = ( int32_t ) args[2];
+
+    // call the function in filemanager
+    int size = _fs_write( filename, buf, size );
+
+    // return the success value given by filemanager
+    RET(_current) = size;
+}
+
+/**
 ** _sys_exit - terminate the calling process
 **
 ** implements:
