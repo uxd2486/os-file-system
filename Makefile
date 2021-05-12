@@ -250,7 +250,7 @@ clock.o: support.h kernel.h process.h stacks.h queues.h klib.h clock.h
 clock.o: scheduler.h
 kernel.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
 kernel.o: process.h stacks.h queues.h klib.h clock.h bootstrap.h syscalls.h
-kernel.o: sio.h scheduler.h ahci.h pci.h users.h
+kernel.o: sio.h scheduler.h ahci.h pci.h filemanager.h users.h
 klibc.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
 klibc.o: process.h stacks.h queues.h klib.h
 kmem.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
@@ -268,11 +268,18 @@ stacks.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
 stacks.o: process.h stacks.h queues.h klib.h
 syscalls.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h
 syscalls.o: x86arch.h process.h stacks.h queues.h klib.h x86pic.h ./uart.h
-syscalls.o: bootstrap.h syscalls.h scheduler.h clock.h sio.h
+syscalls.o: bootstrap.h syscalls.h scheduler.h clock.h sio.h filemanager.h
 ahci.o: ahci.h common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h
 ahci.o: x86arch.h process.h stacks.h queues.h klib.h pci.h x86pic.h
 pci.o: pci.h common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h
 pci.o: x86arch.h process.h stacks.h queues.h klib.h
+filemanager.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h
+filemanager.o: x86arch.h process.h stacks.h queues.h klib.h filemanager.h
+filemanager.o: ulib.h file.h
+file.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
+file.o: process.h stacks.h queues.h klib.h
+block.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
+block.o: process.h stacks.h queues.h klib.h
 users.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
 users.o: process.h stacks.h queues.h klib.h users.h userland/main1.c
 users.o: userland/main2.c userland/main3.c userland/userH.c userland/userZ.c
