@@ -166,7 +166,8 @@ int close_file( File *file ){
 int read_file( File *file, char *buf){
     
     // get the number of blocks to read
-    int num_blocks = ( file->bytes / BLOCK_SIZE ) + 1;
+    int num_blocks = ( file->bytes / BLOCK_SIZE ) + \
+    ( ( file->bytes % BLOCK_SIZE ) != 0 );
 
     // allocate memory in the buffer
     // slices and blocks are the same size so this
@@ -199,7 +200,9 @@ int write_file( File *file, char *buf, int buf_size ){
     }
 
     // append the new stuff
-    int num_blocks =( ( file->bytes + buf_size ) / BLOCK_SIZE ) + 1;
+    int num_bytes = file->bytes + buf_size;
+    int num_blocks =( num_bytes / BLOCK_SIZE ) + \
+    ( ( num_bytes % BLOCK_SIZE ) != 0;
     char *new_contents = _km_slice_alloc( num_blocks );
     new_contents = strcpy( new_contents, contents );
     new_contents = strcat( new_contents, buf );

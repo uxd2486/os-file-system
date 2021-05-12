@@ -46,6 +46,55 @@ void alloc_block( int index ){
 ** PUBLIC FUNCTIONS
 */
 
+void _blk_init(){
+    
+    // get the hdd devices
+    _hddDeviceList_t list = _get_device_list();
+
+    // go through devices and count the sectors
+    int sector_count = 0
+    for ( int i = 0; i < list.count; i++ ){
+        hddDevice_t device = list[i];
+	sector_count += device.sector_count;
+    }
+
+    // calculate number of blocks that can be made
+    block_count = sector_count / NUM_SECTORS;
+
+    // allocate memory to store block info
+    int block_mem = block_count * sizeof( Block );
+    int num_pages = block_mem / PAGE_SIZE;
+    block_list = ( Block * ) _km_page_alloc( num_pages );
+
+    // assign sectors to blocks
+    int count = 0;
+    for ( int i = 0; i < list.count; i++ ){
+        hddDevice_t device = list[i];
+        for ( int j = 0; j < device.sector_count; j += NUM_SECTORS ){
+	    // create the block
+	    Block *block = ( Block * ) _km_slice_alloc( 1 );
+	    block->id = count;
+	    block->device = device;
+	    block->startl = (uint32_t) (j & 0xff);
+	    block->starth = (uint32_t) (j >> 8);
+
+	    // put the block in the list
+	    block_list[count] = *block;
+
+	    // free the memory used
+	    _km_slice_free( block );
+	}
+    }
+
+    // calculate size of the bitmap
+    int map_mem = ( ( block_count / 32 ) + ( ( block_count % 32 ) != 0 ) * 4);
+    // calcualte number of pages for the bitmap
+    int num_pages = ( map_mem / PAGE_SIZE ) + ( ( map_mem % PAGE_SIZE ) != 0);
+    // allocate the bitmap
+    bit_map = ( uint32_t * ) _km_page_alloc( num_pages );
+}
+    
+
 int free_block( int index ){
     bit_map[index / 32] &= ~(1 << (index % 32));
     return SUCCESS;

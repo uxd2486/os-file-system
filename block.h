@@ -34,7 +34,7 @@
 */
 typedef struct block_node {
     int id;
-    HDD_DEVICE device;
+    hddDevice_t device;
     uint32_t startl;
     uint32_t starth;
 } Block;
@@ -47,7 +47,7 @@ typedef struct block_node {
 ** Prototypes
 */
 
-int _blk_init();
+void _blk_init();
 
 int alloc_blocks( int num );
 
