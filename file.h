@@ -30,9 +30,9 @@
 ** Types
 */
 typedef struct i_node {
-    int id;    // unique file id
-    int bytes; // number of bytes written to the file
-    int block; // first of 8 blocks allocated to this file
+    uint32_t id;    // unique file id
+    uint32_t bytes; // number of bytes written to the file
+    uint32_t block; // first of 8 blocks allocated to this file
 } File;
 
 typedef struct file_block {

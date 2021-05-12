@@ -13,6 +13,8 @@
 /*
 ** PRIVATE DEFINITIONS
 */
+// size of file inode in bytes
+#define FILE_INODE_SIZE 12
 
 /*
 ** PRIVATE DATA TYPES
@@ -22,6 +24,7 @@
 ** PRIVATE GLOBAL VARIABLES
 */
 uint32_t *bit_map;
+Block *block_list;
 int block_count;
 
 /*
@@ -85,6 +88,42 @@ int alloc_blocks( int num ){
 
     // Out of blocks?????????
     return E_FAILURE;
+}
+
+int save_file( int id, File *file ){
+    
+    // get the block
+    Block block = block_list[id];
+
+    // write it to the disk
+    bool_t result = writeDisk( block.device, block.startl, block.starth, NUM_SECTORS, (uint16_t *) file );
+
+    // check result of write
+    if ( !result ){
+        return E_FAILURE;
+    }
+
+    return SUCCESS; 
+}
+
+int load_file( int id, File *file ){
+    
+    // get the block
+    Block block = block_list[id];
+
+    uint16_t *buf = _km_slice_alloc( 1 );
+
+    // read it from the disk
+    bool_t result = readDisk( block.device, block.startl, block.starth, NUM_SECTORS, buf );
+
+    // check result of write
+    if ( !result ){
+        return E_FAILURE;
+    }
+
+    file = ( File *) buf;
+
+    return SUCCESS; 
 }
 
 /**

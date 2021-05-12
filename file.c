@@ -71,7 +71,7 @@ int create_file( int id ){
     file_count++;
 
     // save i-node to disk
-    int result = save_file( file, file_block );
+    int result = save_file( file_block, file );
     if ( result < 0 ){
         return E_FAILURE; // something went wrong
     }
@@ -91,7 +91,11 @@ File *open_file( int id ){
     }
 
     File *file = NULL;
-    // TODO load the file i-node from disk
+    // load the file i-node from disk
+    int result = load_file( block_id, file );
+    if ( result < 0 || file == NULL){
+        return E_FAILURE; // something went wrong
+    }
 
     return file;
 }
@@ -104,7 +108,11 @@ int delete_file( int id ){
         return E_FAILURE; // file i-node not found
     }
 
-    // TODO load the file i-node from disk
+    // load the file i-node from disk
+    int result = load_file( block_id, file );
+    if ( result < 0 || file == NULL){
+        return E_FAILURE; // something went wrong
+    }
 
     // free file blocks
     int start_block = file->block;
@@ -114,6 +122,24 @@ int delete_file( int id ){
 
     // free the file i-node block
     free_block( block_id );
+
+    // remove the file from the file_to_block
+    int index = -1;
+    for ( int i = 0; i < file_count; i++ ){
+        if ( file_to_block[i]->block_id == block_id ){
+	    index = -1;
+	    break;
+	}
+    }
+    if ( index == -1 ){
+        return E_FAILURE; // something went wrong
+    }
+    for ( int i = index; i < file_count; i++ ){
+        if ( i + 1 < file_count ){
+            file_to_block[i]->file_id = file_to_block[i+1]->file_id;
+            file_to_block[i]->block_id = file_to_block[i+1]->block_id;
+	}
+    }
 
     return SUCCESS;
 }
@@ -125,7 +151,16 @@ int close_file( File *file ){
         return E_FAILURE; // file i-node not found
     }
 
-    // TODO write the file i-node to the disk
+    // write the file i-node to the disk
+    int result = save_file( file_block, file );
+    if ( result < 0 ){
+        return E_FAILURE; // something went wrong
+    }
+
+    // free the file
+    _km_slice_free( file );
+
+    return SUCCESS;
 }
 
 /**
