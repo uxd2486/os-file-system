@@ -26,10 +26,20 @@
 /*
 ** PRIVATE GLOBAL VARIABLES
 */
-static int file_id_assigner;
+
+// assigns ids to newly created files
+static uint32_t file_id_assigner;
+
+// maps file names to file ids
 static nameMap_t *map;
+
+// number of entries in the map
 static map_count;
+
+// stores i-nodes for open files which are being used
 static file_t **open_files;
+
+// number of open files
 static int open_files_count;
 
 /*
@@ -38,6 +48,16 @@ static int open_files_count;
 
 /*
 ** PRIVATE FUNCTIONS
+*/
+
+/**
+** Name:  get_file_name
+**
+** Given a file id, returns the file name from the map
+**
+** @param file_id    The id of the file we are searching for
+**
+** @return The name of the file
 */
 char *get_file_name( int file_id ){
     for ( int i = 0; i < map_count; i++ ){
@@ -48,6 +68,15 @@ char *get_file_name( int file_id ){
     return NULL;
 }
 
+/**
+** Name:  get_file_id
+**
+** Given a file name, returns the file id from the map
+**
+** @param file_name    The name of the file we are searching for
+**
+** @return The file id
+*/
 int get_file_id( char *file_name ){
     for ( int i = 0; i < map_count; i++ ){
         if ( strcmp(map[i].name, file_name) == 0 ){
@@ -62,6 +91,11 @@ int get_file_id( char *file_name ){
 */
 
 
+/**
+** Name:    _fs_init
+**
+** Initializes the file system
+*/
 void _fs_init(){
     // start at 0
     file_id_assigner = 0;
@@ -78,6 +112,15 @@ void _fs_init(){
     _fl_init();
 }
 
+/**
+** Name:    _fs_create
+**
+** Creates a new file in the file system with the given name
+**
+** @param filename  The name of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fs_create( char *filename ){
 
     // check if name is correct length
@@ -110,6 +153,15 @@ int _fs_create( char *filename ){
     return SUCCESS;
 }
 
+/**
+** Name:    _fs_delete
+**
+** Deletes a file in the file system with the given name
+**
+** @param filename  The name of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fs_delete( char *filename ){
     
     // find the file first
@@ -146,6 +198,15 @@ int _fs_delete( char *filename ){
     return SUCCESS;
 }
 
+/**
+** Name:    _fs_open
+**
+** Opens a file in the file system so it can be used
+**
+** @param filename  The name of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fs_open( char *filename ){
     
     // find the file first
@@ -182,6 +243,15 @@ int _fs_open( char *filename ){
     return SUCCESS;
 }
 
+/**
+** Name:    _fs_close
+**
+** Closes a file in the file system after it has been used
+**
+** @param filename  The name of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fs_close( char *filename ){
     
     // find the file first
@@ -226,6 +296,16 @@ int _fs_close( char *filename ){
     open_files_count--;
 }
 
+/**
+** Name:    _fs_read
+**
+** Reads from a file in the file system with the given name
+**
+** @param filename  The name of the file
+** @param buf       The buffer to be filled with the file contents
+**
+** @return the number of characters read from the file
+*/
 int _fs_read( char *filename, char *buf ){
     
     // get the file id
@@ -255,6 +335,17 @@ int _fs_read( char *filename, char *buf ){
     return result;
 }
 
+/**
+** Name:    _fs_write
+**
+** Writes to a file in the file system with the given name
+**
+** @param filename  The name of the file
+** @param buf       Buffer containing what's to be written
+** @param buf_size  Number of characters to be written
+**
+** @return 0 if successful, -1 if not
+*/
 int _fs_write( char *filename, char *buf, int buf_size ){
    
     // get the file id
@@ -284,12 +375,3 @@ int _fs_write( char *filename, char *buf, int buf_size ){
 
 }
 
-/**
-** Name:  ?
-**
-** ?
-**
-** @param ?    ?
-**
-** @return ?
-*/

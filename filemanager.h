@@ -29,6 +29,10 @@
 ** Types
 */
 
+//
+// Used to store file names with
+// corresponding file ids
+//
 typedef struct str_to_int_s {
     char name[16];
     int id;
@@ -42,18 +46,80 @@ typedef struct str_to_int_s {
 ** Prototypes
 */
 
-void _fs_init();
+/**
+** Name:    _fs_init
+**
+** Initializes the file system
+*/
+void _fs_init( void );
 
+/**
+** Name:    _fs_create
+**
+** Creates a new file in the file system with the given name
+**
+** @param filename  The name of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fs_create( char *filename );
 
+/**
+** Name:    _fs_delete
+**
+** Deletes a file in the file system with the given name
+**
+** @param filename  The name of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fs_delete( char *filename );
 
+/**
+** Name:    _fs_open
+**
+** Opens a file in the file system so it can be used
+**
+** @param filename  The name of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fs_open( char *filename );
 
+/**
+** Name:    _fs_close
+**
+** Closes a file in the file system after it has been used
+**
+** @param filename  The name of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fs_close( char *filename );
 
+/**
+** Name:    _fs_read
+**
+** Reads from a file in the file system with the given name
+**
+** @param filename  The name of the file
+** @param buf       The buffer to be filled with the file contents
+**
+** @return the number of characters read from the file
+*/
 int _fs_read( char *filename, char *buf );
 
+/**
+** Name:    _fs_write
+**
+** Writes to a file in the file system with the given name
+**
+** @param filename  The name of the file
+** @param buf       Buffer containing what's to be written
+** @param buf_size  Number of characters to be written
+**
+** @return 0 if successful, -1 if not
+*/
 int _fs_write( char *filename, char *buf, int buf_size );
 
 #endif
