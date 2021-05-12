@@ -150,6 +150,42 @@ static void _sys_fdelete( uint32_t args[4] ) {
 }
 
 /**
+** _sys_fopen - open a file for reading and writing
+**
+** implements:
+**    int fopen( char *filename );
+*/
+static void _sys_fopen( uint32_t args[4] ) {
+
+    // the only argument is the file name
+    char *filename = ( char *) args[0];
+
+    // call the function in filemanager
+    int result = _fs_open( filename );
+
+    // return the success value given by filemanager
+    RET(_current) = result;
+}
+
+/**
+** _sys_fclose - close a file after usage
+**
+** implements:
+**    int fclose( char *filename );
+*/
+static void _sys_fclose( uint32_t args[4] ) {
+
+    // the only argument is the file name
+    char *filename = ( char *) args[0];
+
+    // call the function in filemanager
+    int result = _fs_close( filename );
+
+    // return the success value given by filemanager
+    RET(_current) = result;
+}
+
+/**
 ** _sys_exit - terminate the calling process
 **
 ** implements:
