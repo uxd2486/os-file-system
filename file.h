@@ -16,10 +16,9 @@
 ** used in either C or assembly-language source code.
 */
 
-#define NUM_BLOCKS 10
+#define NUM_BLOCKS 8
 
 #ifndef SP_ASM_SRC
-
 /*
 ** Start of C-only definitions
 **
@@ -30,35 +29,41 @@
 /*
 ** Types
 */
-typedef struct i_node {
-    int id,
-    int num_dir,
-    int *blocks,
-    int indirect_block
-} File;
+typedef struct i_node_s {
+    uint32_t id;    // unique file id
+    uint32_t bytes; // number of bytes written to the file
+    uint32_t block; // first of 8 blocks allocated to this file
+} file_t;
 
-typedef struct file_map {
-    int file_id,
-    int block_id
-} FileMap;
+typedef struct file_block_s {
+    int file_id;
+    int block_id;
+} filemap_t;
 
 /*
 ** Globals
 */
-static FileMap *file_to_block;
-static int file_count;
 
 /*
 ** Prototypes
 */
 
-File open_file( int id );
+void _fl_init( void );
 
-int close_file( File file );
+/*
+** makes a new file, saves it
+*/
+int _fl_create_( int id );
 
-int read_file( File file, char *buf);
+File *_fl_open( int id );
 
-int write_file( File file, char *buf, int buf_size );
+int _fl_delete( int id );
+
+int _fl_close( file_t *file );
+
+int _fl_read( file_t *file, char *buf);
+
+int _fl_write( file_t *file, char *buf, int buf_size );
 
 #endif
 /* SP_ASM_SRC */

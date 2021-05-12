@@ -33,9 +33,15 @@
 #define SYS_sleep     9
 #define SYS_spawn     10
 #define SYS_wait      11
+#define SYS_fcreate   12
+#define SYS_fdelete   13
+#define SYS_fopen     14
+#define SYS_fclose    15
+#define SYS_fread     16
+#define SYS_fwrite    17
 
 // UPDATE THIS DEFINITION IF MORE SYSCALLS ARE ADDED!
-#define N_SYSCALLS    12
+#define N_SYSCALLS    18
 
 // dummy system call code for testing our ISR
 #define SYS_bogus     0xbad

@@ -22,6 +22,7 @@
 #include "scheduler.h"
 #include "support.h"
 #include "ahci.h"
+#include "filemanager.h"
 
 // need init() and idle() addresses
 #include "users.h"
@@ -136,6 +137,7 @@ void _init( void ) {
     _clk_init();
     _sio_init();
     _ahci_init();
+    _fs_init(); // MUST BE AFTER AHCI INIT
 
     __cio_puts( "\nModule initialization complete.\n" );
     __cio_puts( "-------------------------------\n" );

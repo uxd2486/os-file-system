@@ -25,6 +25,8 @@
 #include "cio.h"
 #include "sio.h"
 
+#include "filemanager.h"
+
 // copied from ulib.h
 extern void exit_helper( void );
 
@@ -109,6 +111,125 @@ static void _sys_isr( int vector, int code ) {
 ** Values being returned to the user are placed into the EAX
 ** field in the context save area for that process.
 */
+
+
+/**
+** _sys_fcreate - create a file
+**
+** implements:
+**    int fcreate( char *filename );
+*/
+static void _sys_fcreate( uint32_t args[4] ) {
+
+    // the only argument is the file name
+    char *filename = ( char *) args[0];
+
+    // call the function in filemanager
+    int result = _fs_create( filename );
+
+    // return the success value given by filemanager
+    RET(_current) = result;
+}
+
+/**
+** _sys_fdelete - delete a file
+**
+** implements:
+**    int fdelete( char *filename );
+*/
+static void _sys_fdelete( uint32_t args[4] ) {
+
+    // the only argument is the file name
+    char *filename = ( char *) args[0];
+
+    // call the function in filemanager
+    int result = _fs_delete( filename );
+
+    // return the success value given by filemanager
+    RET(_current) = result;
+}
+
+/**
+** _sys_fopen - open a file for reading and writing
+**
+** implements:
+**    int fopen( char *filename );
+*/
+static void _sys_fopen( uint32_t args[4] ) {
+
+    // the only argument is the file name
+    char *filename = ( char *) args[0];
+
+    // call the function in filemanager
+    int result = _fs_open( filename );
+
+    // return the success value given by filemanager
+    RET(_current) = result;
+}
+
+/**
+** _sys_fclose - close a file after usage
+**
+** implements:
+**    int fclose( char *filename );
+*/
+static void _sys_fclose( uint32_t args[4] ) {
+
+    // the only argument is the file name
+    char *filename = ( char *) args[0];
+
+    // call the function in filemanager
+    int result = _fs_close( filename );
+
+    // return the success value given by filemanager
+    RET(_current) = result;
+}
+
+/**
+** _sys_fread - read from a file
+**
+** implements:
+**    int fread( char *filename, char *buf );
+*/
+static void _sys_fread( uint32_t args[4] ) {
+
+    // first argument is the file name
+    char *filename = ( char *) args[0];
+
+    // second argument is the buffer to store file contents in
+    char *buf = ( char * ) args[1];
+
+    // call the function in filemanager
+    int size = _fs_read( filename, buf );
+
+    // return the number of characters read
+    // includes the NULL terminator
+    RET(_current) = size;
+}
+
+/**
+** _sys_fwrite - write to a file
+**
+** implements:
+**    int fwrite( char *filename, char *buf, int size );
+*/
+static void _sys_fwrite( uint32_t args[4] ) {
+
+    // first argument is the file name
+    char *filename = ( char *) args[0];
+
+    // second argument is the string to be written
+    char *buf = ( char * ) args[1];
+
+    // third argument is length of the string(not including NULL-terminator)
+    int32_t size = ( int32_t ) args[2];
+
+    // call the function in filemanager
+    int size = _fs_write( filename, buf, size );
+
+    // return the success value given by filemanager
+    RET(_current) = size;
+}
 
 /**
 ** _sys_exit - terminate the calling process

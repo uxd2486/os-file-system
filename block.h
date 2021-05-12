@@ -17,7 +17,8 @@
 ** This section of the header file contains definitions that can be
 ** used in either C or assembly-language source code.
 */
-#define NUM_PAGES 3
+#define BLOCK_SIZE 1024
+#define NUM_SECTORS 2
 
 #ifndef SP_ASM_SRC
 
@@ -31,15 +32,12 @@
 /*
 ** Types
 */
-typedef union block_container {
-    
-} block_contents;
-
 typedef struct block_node {
-    int id,
-    int indirect,
-    block_contents *contents
-} Block;
+    int id;
+    hddDevice_t device;
+    uint32_t startl;
+    uint32_t starth;
+} block_t;
 
 /*
 ** Globals
@@ -49,9 +47,19 @@ typedef struct block_node {
 ** Prototypes
 */
 
-Block load_block( int id );
+void _blk_init();
 
-int save_block( Block block );
+int _blk_alloc( int num );
+
+int _blk_free( int id );
+
+int _blk_load_file( int id, file_t *file );
+
+int _blk_save_file( int id, file_t *file );
+
+int _blk_load_filecontents( int id, char *buf, int num_blocks );
+
+int _blk_save_filecontents( int id, char *contents, int num_blocks );
 
 #endif
 /* SP_ASM_SRC */
