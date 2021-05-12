@@ -29,16 +29,16 @@
 /*
 ** Types
 */
-typedef struct i_node {
+typedef struct i_node_s {
     uint32_t id;    // unique file id
     uint32_t bytes; // number of bytes written to the file
     uint32_t block; // first of 8 blocks allocated to this file
-} File;
+} file_t;
 
-typedef struct file_block {
+typedef struct file_block_s {
     int file_id;
     int block_id;
-} file_map;
+} filemap_t;
 
 /*
 ** Globals
@@ -48,22 +48,22 @@ typedef struct file_block {
 ** Prototypes
 */
 
-void _fl_init();
+void _fl_init( void );
 
 /*
 ** makes a new file, saves it
 */
-int create_file( int id );
+int _fl_create_( int id );
 
-File *open_file( int id );
+File *_fl_open( int id );
 
-int delete_file( int id );
+int _fl_delete( int id );
 
-int close_file( File *file );
+int _fl_close( file_t *file );
 
-int read_file( File *file, char *buf);
+int _fl_read( file_t *file, char *buf);
 
-int write_file( File *file, char *buf, int buf_size );
+int _fl_write( file_t *file, char *buf, int buf_size );
 
 #endif
 /* SP_ASM_SRC */

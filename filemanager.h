@@ -29,10 +29,10 @@
 ** Types
 */
 
-typedef struct str_to_int {
+typedef struct str_to_int_s {
     char name[16];
     int id;
-} file_map;
+} nameMap_t;
 
 /*
 ** Globals
@@ -44,17 +44,17 @@ typedef struct str_to_int {
 
 void _fs_init();
 
-int create_file( char *filename );
+int _fs_create( char *filename );
 
-int delete_file( char *filename );
+int _fs_delete( char *filename );
 
-int open_file( char *filename );
+int _fs_open( char *filename );
 
-int close_file( char *filename );
+int _fs_close( char *filename );
 
-int read_file( char *filename, char *buf );
+int _fs_read( char *filename, char *buf );
 
-int write_file( char *filename, char *buf, int buf_size );
+int _fs_write( char *filename, char *buf, int buf_size );
 
 #endif
 /* SP_ASM_SRC */

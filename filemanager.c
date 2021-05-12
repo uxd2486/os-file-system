@@ -13,6 +13,7 @@
 #include "filemanager.h"
 #include "ulib.h"
 #include "file.h"
+#include "kmem.h"
 
 /*
 ** PRIVATE DEFINITIONS
@@ -26,9 +27,9 @@
 ** PRIVATE GLOBAL VARIABLES
 */
 static int file_id_assigner;
-static file_map *map;
+static nameMap_t *map;
 static map_count;
-static File **open_files;
+static file_t **open_files;
 static int open_files_count;
 
 /*
@@ -65,21 +66,22 @@ void _fs_init(){
     // start at 0
     file_id_assigner = 0;
 
-    // allocate stuff, set counts to zero
-    map = ( file_map * ) _km_page_alloc( 2 );
+    // allocate map of names to file ids
+    map = ( nameMap_t * ) _km_page_alloc( 2 );
     map_count = 0;
 
-    open_files = ( (File *) * ) _km_page_alloc( 2 );
+    // allocate list of open file i-nodes
+    open_files = ( (file_t *) * ) _km_page_alloc( 2 );
     open_files_count = 0;
 
     // call the file init
     _fl_init();
 }
 
-int create_file( char *filename ){
+int _fs_create( char *filename ){
 
     // check if name is correct length
-    if ( strlen( filename) >= 16 ){
+    if ( strlen( filename ) >= 16 ){
         return E_FAILURE;
     }
     
@@ -91,25 +93,24 @@ int create_file( char *filename ){
     }
 
     // make file in storage first
-    int file_id = create_file( file_id_assigner );
+    int file_id = _fl_create( file_id_assigner );
     if ( file_id < 0 ){
         return E_FAILURE;
     }
     file_id_assigner++;
 
     // add file to filename list
-    file_map *new_map = ( file_map *) _km_slice_alloc( 1 );
+    nameMap_t *new_map = ( nameMap_t *) _km_slice_alloc( 1 );
     new_map->id = id;
     strcpy( new_map->name, filename );
     map[file_count] = *new_map;
     file_count++;
     _km_slice_free( new_map );
 
-
     return SUCCESS;
 }
 
-int delete_file( char *filename ){
+int _fs_delete( char *filename ){
     
     // find the file first
     int id = -1;
@@ -127,7 +128,7 @@ int delete_file( char *filename ){
     }
     
     // delete file from disk
-    int result = delete_file( id );
+    int result = _fl_delete( id );
     if ( result < 0 ){
         return E_FAILURE; // unable to delete file
     }
@@ -135,7 +136,7 @@ int delete_file( char *filename ){
     // delete file from the map
     for ( int i = index; i < map_count; i++ ){
         if ( i + 1 < map_count ){
-             file_map temp = map[i+1];
+             nameMap_t temp = map[i+1];
 	     map[i].id = temp.id;
 	     strcpy( map[i].name, temp.name );
 	}
@@ -145,7 +146,7 @@ int delete_file( char *filename ){
     return SUCCESS;
 }
 
-int open_file( char *filename ){
+int _fs_open( char *filename ){
     
     // find the file first
     int id = -1;
@@ -162,14 +163,14 @@ int open_file( char *filename ){
 
     //check if file is already open
     for ( int i = 0; i < open_files_count; i++ ){
-        File *file = open_files[i];
+        file_t *file = open_files[i];
 	if ( file->id == id ){
 	    return E_FAILURE; // file is already open
 	}
     }
 
     // load the file
-    File *file = open_file( id );
+    file_t *file = _fl_open( id );
     if ( file == NULL ){
         return E_FAILURE;
     }
@@ -181,7 +182,7 @@ int open_file( char *filename ){
     return SUCCESS;
 }
 
-int close_file( char *filename ){
+int _fs_close( char *filename ){
     
     // find the file first
     int id = -1;
@@ -199,7 +200,7 @@ int close_file( char *filename ){
     }
 
     // find the file in the open file list
-    File *file = NULL;
+    file_t *file = NULL;
     for ( int i = 0; i < open_files_count; i++ ){
         if ( open_files[i].id == id ){
             file = &open_files[i];
@@ -211,7 +212,7 @@ int close_file( char *filename ){
     }
 
     // close the file
-    int result = close_file( file );
+    int result = _fl_close( file );
     if ( result < 0 ){
         return E_FAILURE; // something went wrong
     }
@@ -225,7 +226,7 @@ int close_file( char *filename ){
     open_files_count--;
 }
 
-int read_file( char *filename, char *buf ){
+int _fs_read( char *filename, char *buf ){
     
     // get the file id
     int file_id = get_file_id( filename );
@@ -245,7 +246,7 @@ int read_file( char *filename, char *buf ){
         return E_FAILURE; // file isn't in the open list
     }
 
-    int result = read_file( file, buf);
+    int result = _fl_read( file, buf);
     if( result < 0 ){
         return E_FAILURE; //something went wrong
     }
@@ -253,7 +254,7 @@ int read_file( char *filename, char *buf ){
     return SUCCESS;
 }
 
-int write_file( char *filename, char *buf, int buf_size ){
+int _fs_write( char *filename, char *buf, int buf_size ){
    
     // get the file id
     int file_id = get_file_id( filename );
@@ -273,7 +274,7 @@ int write_file( char *filename, char *buf, int buf_size ){
         return E_FAILURE; // file isn't in the open list
     }
 
-    int result = write_file( file, buf, buf_size );
+    int result = _fl_write( file, buf, buf_size );
     if( result < 0 ){
         return E_FAILURE; //something went wrong
     }

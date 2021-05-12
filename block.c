@@ -9,6 +9,7 @@
 #define	SP_KERNEL_SRC
 
 #include "common.h"
+#include "kmem.h"
 
 /*
 ** PRIVATE DEFINITIONS
@@ -24,7 +25,7 @@
 ** PRIVATE GLOBAL VARIABLES
 */
 uint32_t *bit_map;
-Block *block_list;
+block_t *block_list;
 int block_count;
 
 /*
@@ -62,9 +63,9 @@ void _blk_init(){
     block_count = sector_count / NUM_SECTORS;
 
     // allocate memory to store block info
-    int block_mem = block_count * sizeof( Block );
+    int block_mem = block_count * sizeof( block_t );
     int num_pages = block_mem / PAGE_SIZE;
-    block_list = ( Block * ) _km_page_alloc( num_pages );
+    block_list = ( block_t * ) _km_page_alloc( num_pages );
 
     // assign sectors to blocks
     int count = 0;
@@ -72,7 +73,7 @@ void _blk_init(){
         hddDevice_t device = list[i];
         for ( int j = 0; j < device.sector_count; j += NUM_SECTORS ){
 	    // create the block
-	    Block *block = ( Block * ) _km_slice_alloc( 1 );
+	    block_t *block = ( block_t * ) _km_slice_alloc( 1 );
 	    block->id = count;
 	    block->device = device;
 	    block->startl = (uint32_t) (j & 0xff);
@@ -95,12 +96,12 @@ void _blk_init(){
 }
     
 
-int free_block( int index ){
+int _blk_free( int index ){
     bit_map[index / 32] &= ~(1 << (index % 32));
     return SUCCESS;
 }
 
-int alloc_blocks( int num ){
+int _blk_alloc( int num ){
     
     // index of block being processed
     int idx = 0;
@@ -139,10 +140,10 @@ int alloc_blocks( int num ){
     return E_FAILURE;
 }
 
-int save_file( int id, File *file ){
+int _blk_save_file( int id, File *file ){
     
     // get the block
-    Block block = block_list[id];
+    block_t block = block_list[id];
 
     // write it to the disk
     bool_t result = writeDisk( block.device, block.startl, block.starth, NUM_SECTORS, (uint16_t *) file );
@@ -155,10 +156,10 @@ int save_file( int id, File *file ){
     return SUCCESS; 
 }
 
-int load_file( int id, File *file ){
+int _blk_load_file( int id, File *file ){
     
     // get the block
-    Block block = block_list[id];
+    block_t block = block_list[id];
 
     uint16_t *buf = _km_slice_alloc( 1 );
 
@@ -176,7 +177,7 @@ int load_file( int id, File *file ){
     return SUCCESS; 
 }
 
-int load_filecontents( int id, char *buf, int num_blocks ){
+int _blk_load_filecontents( int id, char *buf, int num_blocks ){
     
     // for passing in to the disk driver
     char *buf_ptr = buf;
@@ -185,7 +186,7 @@ int load_filecontents( int id, char *buf, int num_blocks ){
     for( int i = id; i < id + num_blocks; i++ ){
         
 	// get the block
-        Block block = block_list[i];
+        block_t block = block_list[i];
 
 	// read block from the disk
         bool_t result = readDisk( block.device, block.startl, block.starth,\
@@ -203,7 +204,7 @@ int load_filecontents( int id, char *buf, int num_blocks ){
     return SUCCESS;
 }
 
-int save_filecontents( int id, char *contents, int num_blocks ){
+int _blk_save_filecontents( int id, char *contents, int num_blocks ){
     
     // for passing in to the disk driver
     char *buf_ptr = buf;
@@ -212,7 +213,7 @@ int save_filecontents( int id, char *contents, int num_blocks ){
     for( int i = id; i < id + num_blocks; i++ ){
         
 	// get the block
-        Block block = block_list[i];
+        block_t block = block_list[i];
 
 	// write block to the disk
         bool_t result = writeDisk( block.device, block.startl, block.starth,\
