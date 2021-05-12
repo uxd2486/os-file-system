@@ -4,8 +4,7 @@
 #include "common.h"
 #include "pci.h"
 
-
-#define AHCI_BASE   0x400000 // 4M
+#define AHCI_BASE       0x00400000  // 4 Megabyte offset
 
 #define SATA_SIG_ATA    0x00000101  // SATA drive
 #define SATA_SIG_ATAPI  0xEB140101  // SATAPI drive
@@ -411,7 +410,7 @@ typedef struct tagidentifyDeviceData {
     uint16_t NumberOfCurrentHeads;
     uint16_t CurrentSectorsPerTrack;
     //Word 57-58
-    uint32_t CurrentSectorCapacity;
+    uint16_t CurrentSectorCapacity[2];
     //Word 59
     uint8_t  CurrentMultiSectorSetting;
     uint8_t  MultiSectorSettingValid : 1;
@@ -421,7 +420,7 @@ typedef struct tagidentifyDeviceData {
     uint8_t  OverwriteExtCommandSupported : 1;
     uint8_t  BlockEraseExtCommandSupported : 1;
     //Word 60-61
-    uint32_t UserAddressableSectors;
+    uint16_t UserAddressableSectors[2];
     uint16_t ObsoleteWord62;
     //Word 63
     uint16_t MultiWordDMASupport : 8;
@@ -641,9 +640,9 @@ typedef struct tagidentifyDeviceData {
     uint16_t StreamingTransferTimeDMA;
     uint16_t StreamingAccessLatencyDMAPIO;
     //Word 98-99
-    uint32_t StreamingPerfGranularity;
+    uint16_t StreamingPerfGranularity[2];
     //Word 100-103
-    uint32_t Max48BitLBA[2];
+    uint16_t Max48BitLBA[4];
     //Word 104
     uint16_t StreamingTransferTime;
     uint16_t DsmCap;
@@ -791,7 +790,7 @@ typedef struct tagidentifyDeviceData {
     //Word 224-229
     uint16_t ReservedWord224[6];
     //Word 230-233
-    uint32_t ExtendedNumberOfUserAddressableSectors[2];
+    uint16_t ExtendedNumberOfUserAddressableSectors[4];
     //Word 234
     uint16_t MinBlocksPerDownloadMicrocodeMode03;
     uint16_t MaxBlocksPerDownloadMicrocodeMode03;

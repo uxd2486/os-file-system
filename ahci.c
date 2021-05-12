@@ -498,7 +498,7 @@ void _ahci_init()
    }
 
    identifyDeviceData_t* tempIDData = (identifyDeviceData_t*)_km_page_alloc(1);
-   __memset(tempIDData, 512, 255);
+   __memset(tempIDData, 4000, 0);
 
    for(int i = 0; i < _hddDevs.count; i++){
       get_drive_info(_hddDevs.devices[i].port, tempIDData);
@@ -508,33 +508,50 @@ void _ahci_init()
       uint8_t shift = 0;
 
       if(tempIDData->CommandSetSupport.BigLba) {
-         if(tempIDData->CommandSetActive.BigLba) {
-            secl = tempIDData->Max48BitLBA[1];
-            sech = tempIDData->Max48BitLBA[0];
-            shift = 32;
-         }
-         else {
-            secl = tempIDData->ExtendedNumberOfUserAddressableSectors[1];
-            sech = tempIDData->ExtendedNumberOfUserAddressableSectors[0];
-            shift = 32;
-         }
+         secl = (uint32_t)tempIDData->Max48BitLBA[0] + ((uint32_t)tempIDData->Max48BitLBA[1] << 16);
+         sech = (uint32_t)tempIDData->Max48BitLBA[2] + ((uint32_t)tempIDData->Max48BitLBA[3] << 16);
+         shift = 32;
       }
       else {
-         secl = tempIDData->UserAddressableSectors;
+         secl = (uint32_t)tempIDData->UserAddressableSectors[0] + ((uint32_t)tempIDData->UserAddressableSectors[1] << 16);
          shift = 0;
       }
 
-      _hddDevs.devices[i].sector_count = (uint64_t)secl | ((uint64_t)sech << shift);
+      _hddDevs.devices[i].sector_count = (uint64_t)secl + ((uint64_t)sech << shift) - 1;
 
-      if(tempIDData->PhysicalLogicalSectorSize.LogicalSectorLongerThan256Words) {
+      if(tempIDData->PhysicalLogicalSectorSize.Reserved1 == 0) {
          _hddDevs.devices[i].sector_size = 512;
       }
       else {
-         _hddDevs.devices[i].sector_size = 256;
+         if(tempIDData->PhysicalLogicalSectorSize.LogicalSectorLongerThan256Words) {
+            _hddDevs.devices[i].sector_size = (uint32_t)tempIDData->WordsPerLogicalSector[0] + ((uint32_t)tempIDData->WordsPerLogicalSector[1] << 16);
+         }
+         else {
+            _hddDevs.devices[i].sector_size = 256;
+         }
       }
       _hddDevs.devices[i].total_bytes = _hddDevs.devices[i].sector_count * _hddDevs.devices[i].sector_size;
    }
    _km_page_free(tempIDData);
+
+   __cio_printf("\n%d, %d", _hddDevs.devices[0].total_bytes);
+
+   //DEMO CODE
+   //CAREFULL ON REAL HARDWARE. WILL OVERWRITE DISK.
+   //Reads the drive (sector 5) then writes to the drive in the same place.
+   /*void* buffer = _km_page_alloc(1);
+   __memset(buffer, 512, 0xFF);
+   __cio_printf("\nClear buffer: %08x", *(uint32_t*)buffer);
+   _read_disk(_hddDevs.devices[0], 5, 0, 1, buffer);
+   __cio_printf("\nRead drive: %08x", *(uint32_t*)buffer);
+   __memset(buffer, 512, 0xFF);
+   __cio_printf("\nClear buffer: %08x", *(uint32_t*)buffer);
+   _write_disk(_hddDevs.devices[0], 5, 0, 1, buffer);
+   __cio_printf("\nWrote to drive");
+   _read_disk(_hddDevs.devices[0], 5, 0, 1, buffer);
+   __cio_printf("\nRead drive: %08x", *(uint32_t*)buffer);
+   _km_page_free(buffer);*/
+   //END DEMO CODE
 
    
    __cio_printf(" done");
