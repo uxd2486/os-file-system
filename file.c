@@ -41,6 +41,17 @@ static int file_count;
 /*
 ** PRIVATE FUNCTIONS
 */
+
+/**
+** Name:  get_block_id
+**
+** Given the file id, returns the block id of the file i-node from the map.
+**
+** @param file_id   The id of the file
+**
+** @return The block id 
+**
+*/
 int get_block_id( int file_id ){
     
     int block_id = -1;
