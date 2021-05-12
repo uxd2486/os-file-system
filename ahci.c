@@ -534,8 +534,6 @@ void _ahci_init()
    }
    _km_page_free(tempIDData);
 
-   __cio_printf("\n%d, %d", _hddDevs.devices[0].total_bytes);
-
    //DEMO CODE
    //CAREFULL ON REAL HARDWARE. WILL OVERWRITE DISK.
    //Reads the drive (sector 5) then writes to the drive in the same place.

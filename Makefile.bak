@@ -277,9 +277,9 @@ filemanager.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h
 filemanager.o: x86arch.h process.h stacks.h queues.h klib.h filemanager.h
 filemanager.o: ulib.h file.h
 file.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
-file.o: process.h stacks.h queues.h klib.h
+file.o: process.h stacks.h queues.h klib.h file.h block.h
 block.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
-block.o: process.h stacks.h queues.h klib.h
+block.o: process.h stacks.h queues.h klib.h block.h ahci.h pci.h
 users.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
 users.o: process.h stacks.h queues.h klib.h users.h userland/main1.c
 users.o: userland/main2.c userland/main3.c userland/userH.c userland/userZ.c
