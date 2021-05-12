@@ -21,6 +21,7 @@
 #include "sio.h"
 #include "scheduler.h"
 #include "support.h"
+#include "ahci.h"
 
 // need init() and idle() addresses
 #include "users.h"
