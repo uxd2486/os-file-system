@@ -125,12 +125,14 @@ int _fs_create( char *filename ){
 
     // check if name is correct length
     if ( strlen( filename ) >= 16 ){
+        __cio_printf( "File name '%s' is too long\n", filename );
         return E_FAILURE;
     }
     
     // check if file already exists
     for ( int i = 0; i < map_count; i++ ){
         if ( strcmp( map[i].name, filename ) == 0 ){
+            __cio_printf( "File '%s' that already exists\n", filename );
             return E_FAILURE;
 	}
     }
@@ -176,6 +178,7 @@ int _fs_delete( char *filename ){
     }
 
     if ( id == -1 || index == -1){
+        __cio_printf( "File '%s' does not exist\n", filename );
         return E_FAILURE; // file doesn't exist
     }
     
@@ -219,6 +222,7 @@ int _fs_open( char *filename ){
     }
 
     if ( id == -1){
+        __cio_printf( "File '%s' does not exist\n", filename );
         return E_FAILURE; // file doesn't exist
     }
 
@@ -226,6 +230,7 @@ int _fs_open( char *filename ){
     for ( int i = 0; i < open_files_count; i++ ){
         file_t *file = open_files[i];
 	if ( file->id == id ){
+            __cio_printf( "File '%s' is already open\n", filename );
 	    return E_FAILURE; // file is already open
 	}
     }
@@ -266,6 +271,7 @@ int _fs_close( char *filename ){
     }
 
     if ( id == -1 || index == -1){
+        __cio_printf( "File '%s' does not exist\n", filename );
         return E_FAILURE; // file doesn't exist
     }
 
@@ -278,6 +284,7 @@ int _fs_close( char *filename ){
     }
 
     if ( file == NULL ){
+        __cio_printf( "File '%s' is not open. Cannot close it.\n", filename );
         return E_FAILURE; // file isn't in the open list
     }
 
@@ -311,6 +318,7 @@ int _fs_read( char *filename, char *buf ){
     // get the file id
     int file_id = get_file_id( filename );
     if ( file_id < 0 ){
+        __cio_printf( "File '%s' does not exist\n", filename );
         return E_FAILURE; // file doesn't exist
     }
 
@@ -323,6 +331,7 @@ int _fs_read( char *filename, char *buf ){
     }
 
     if ( file == NULL ){
+        __cio_printf( "File '%s' is not open, cannot read\n", filename );
         return E_FAILURE; // file isn't in the open list
     }
 
@@ -351,6 +360,7 @@ int _fs_write( char *filename, char *buf, int buf_size ){
     // get the file id
     int file_id = get_file_id( filename );
     if ( file_id < 0 ){
+        __cio_printf( "File '%s' does not exist\n", filename );
         return E_FAILURE; // file doesn't exist
     }
 
@@ -363,6 +373,7 @@ int _fs_write( char *filename, char *buf, int buf_size ){
     }
 
     if ( file == NULL ){
+        __cio_printf( "File '%s' is not open, cannot write\n", filename );
         return E_FAILURE; // file isn't in the open list
     }
 

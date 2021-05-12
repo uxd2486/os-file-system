@@ -131,6 +131,7 @@ file_t *_fl_open( int id ){
     // get the block the i-node is in
     int block_id = get_block_id( id );
     if ( block_id == -1 ){
+        __cio_printf( "File %d does not have an i-node??\n", id );
         return E_FAILURE; // file i-node not found
     }
 
@@ -158,6 +159,7 @@ int _fl_delete( int id ){
     // get the block that the i-node is in
     int block_id = get_block_id( id );
     if ( block_id == -1 ){
+        __cio_printf( "File %d does not have an i-node??\n", id );
         return E_FAILURE; // file i-node not found
     }
 
@@ -185,6 +187,7 @@ int _fl_delete( int id ){
 	}
     }
     if ( index == -1 ){
+        __cio_printf( "File %d does not have an i-node??\n", id );
         return E_FAILURE; // something went wrong
     }
     for ( int i = index; i < file_count; i++ ){
@@ -210,6 +213,7 @@ int _fl_close( file_t *file ){
     
     int block_id = get_block_id( file->id );
     if ( block_id == -1 ){
+        __cio_printf( "File %d does not have an i-node??\n", file->id );
         return E_FAILURE; // file i-node not found
     }
 

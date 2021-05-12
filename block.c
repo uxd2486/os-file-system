@@ -182,6 +182,7 @@ int _blk_alloc( int num ){
     }
 
     // Out of blocks?????????
+    __cio_printf( "Ran out of blocks?????\n");
     return E_FAILURE;
 }
 
@@ -209,6 +210,7 @@ int _blk_save_file( int id, File *file ){
 
     // check result of write
     if ( !result ){
+        __cio_printf( "Unable to write to disk\n");
         return E_FAILURE;
     }
 
@@ -240,8 +242,9 @@ int _blk_load_file( int id, File *file ){
     bool_t result = readDisk( device, block.startl, block.starth,\
     NUM_SECTORS, buf );
 
-    // check result of write
+    // check result of read
     if ( !result ){
+        __cio_printf( "Unable to read from disk\n");
         return E_FAILURE;
     }
 
@@ -281,8 +284,9 @@ int _blk_load_filecontents( int id, char *buf, int num_blocks ){
         bool_t result = readDisk( device, block.startl, block.starth,\
         NUM_SECTORS, ( uint16_t *) buf_ptr );
         
-	// check result of write
+	// check result of read
         if ( !result ){
+            __cio_printf( "Unable to read from disk\n");
             return E_FAILURE;
         }
 	
@@ -326,6 +330,7 @@ int _blk_save_filecontents( int id, char *contents, int num_blocks ){
         
 	// check result of write
         if ( !result ){
+            __cio_printf( "Unable to write to disk\n");
             return E_FAILURE;
         }
 	
