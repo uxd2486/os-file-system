@@ -37,10 +37,10 @@
 ** Stores info about each block in the disk
 */
 typedef struct block_node {
-    int id;
-    hddDevice_t device;
-    uint32_t startl;
-    uint32_t starth;
+    uint32_t id;       // unique id
+    uint32_t device;   // index of device in device list 
+    uint32_t startl;   // lower half of address of starting sector
+    uint32_t starth;   // upper half of address of starting sector
 } block_t;
 
 /*

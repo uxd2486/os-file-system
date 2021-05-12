@@ -104,7 +104,7 @@ void _blk_init( void ){
 	    // create the block
 	    block_t *block = ( block_t * ) _km_slice_alloc( 1 );
 	    block->id = count;
-	    block->device = device;
+	    block->device = (uint32_t) i;
 	    block->startl = (uint32_t) (j & 0xff);
 	    block->starth = (uint32_t) (j >> 8);
 
@@ -200,8 +200,12 @@ int _blk_save_file( int id, File *file ){
     // get the block
     block_t block = block_list[id];
 
+    // get the device
+    _hddDeviceList_t list = _get_device_list();
+    hddDevice_t device = list[block.device];
+
     // write it to the disk
-    bool_t result = writeDisk( block.device, block.startl, block.starth, NUM_SECTORS, (uint16_t *) file );
+    bool_t result = writeDisk( device, block.startl, block.starth, NUM_SECTORS, (uint16_t *) file );
 
     // check result of write
     if ( !result ){
@@ -225,11 +229,15 @@ int _blk_load_file( int id, File *file ){
     
     // get the block
     block_t block = block_list[id];
+    
+    // get the device
+    _hddDeviceList_t list = _get_device_list();
+    hddDevice_t device = list[block.device];
 
     uint16_t *buf = _km_slice_alloc( 1 );
 
     // read it from the disk
-    bool_t result = readDisk( block.device, block.startl, block.starth,\
+    bool_t result = readDisk( device, block.startl, block.starth,\
     NUM_SECTORS, buf );
 
     // check result of write
@@ -264,9 +272,13 @@ int _blk_load_filecontents( int id, char *buf, int num_blocks ){
         
 	// get the block
         block_t block = block_list[i];
+        
+	// get the device
+        _hddDeviceList_t list = _get_device_list();
+        hddDevice_t device = list[block.device];
 
 	// read block from the disk
-        bool_t result = readDisk( block.device, block.startl, block.starth,\
+        bool_t result = readDisk( device, block.startl, block.starth,\
         NUM_SECTORS, ( uint16_t *) buf_ptr );
         
 	// check result of write
@@ -303,9 +315,13 @@ int _blk_save_filecontents( int id, char *contents, int num_blocks ){
         
 	// get the block
         block_t block = block_list[i];
+        
+	// get the device
+        _hddDeviceList_t list = _get_device_list();
+        hddDevice_t device = list[block.device];
 
 	// write block to the disk
-        bool_t result = writeDisk( block.device, block.startl, block.starth,\
+        bool_t result = writeDisk( device, block.startl, block.starth,\
         NUM_SECTORS, ( uint16_t *) buf_ptr );
         
 	// check result of write
