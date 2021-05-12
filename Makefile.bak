@@ -11,12 +11,9 @@
 #
 
 OS_C_SRC = clock.c kernel.c klibc.c kmem.c process.c queues.c \
-	scheduler.c sio.c stacks.c syscalls.c ahci.c pci.c \
-	filemanager.c file.c block.c
+	scheduler.c sio.c stacks.c syscalls.c ahci.c pci.c
 OS_C_OBJ = clock.o kernel.o klibc.o kmem.o process.o queues.o \
-	scheduler.o sio.o stacks.o syscalls.o ahci.o pci.o \
-	filemanager.o file.o block.o
-
+	scheduler.o sio.o stacks.o syscalls.o ahci.o pci.o
 
 OS_S_SRC = klibs.S
 OS_S_OBJ = klibs.o
@@ -250,7 +247,7 @@ clock.o: support.h kernel.h process.h stacks.h queues.h klib.h clock.h
 clock.o: scheduler.h
 kernel.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
 kernel.o: process.h stacks.h queues.h klib.h clock.h bootstrap.h syscalls.h
-kernel.o: sio.h scheduler.h ahci.h pci.h users.h
+kernel.o: sio.h scheduler.h users.h
 klibc.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
 klibc.o: process.h stacks.h queues.h klib.h
 kmem.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
@@ -269,10 +266,6 @@ stacks.o: process.h stacks.h queues.h klib.h
 syscalls.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h
 syscalls.o: x86arch.h process.h stacks.h queues.h klib.h x86pic.h ./uart.h
 syscalls.o: bootstrap.h syscalls.h scheduler.h clock.h sio.h
-ahci.o: ahci.h common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h
-ahci.o: x86arch.h process.h stacks.h queues.h klib.h pci.h x86pic.h
-pci.o: pci.h common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h
-pci.o: x86arch.h process.h stacks.h queues.h klib.h
 users.o: common.h kdefs.h cio.h kmem.h compat.h support.h kernel.h x86arch.h
 users.o: process.h stacks.h queues.h klib.h users.h userland/main1.c
 users.o: userland/main2.c userland/main3.c userland/userH.c userland/userZ.c
