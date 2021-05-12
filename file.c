@@ -163,6 +163,61 @@ int close_file( File *file ){
     return SUCCESS;
 }
 
+int read_file( File *file, char *buf){
+    
+    // get the number of blocks to read
+    int num_blocks = ( file->bytes / BLOCK_SIZE ) + 1;
+
+    // allocate memory in the buffer
+    // slices and blocks are the same size so this
+    // works really well
+    buf = ( char * ) _km_slice_alloc( num_blocks );
+
+    // read file contents from disk
+    int result = load_filecontents( file->block, buf, num_blocks );
+
+    // check result
+    if ( result < 0 ){
+        return E_FAILURE;
+    }
+
+    // nul-terminate buffer so it can be a string
+    buf[file->bytes] = '\0';
+
+    return SUCCESS;
+}
+
+int write_file( File *file, char *buf, int buf_size ){
+    
+    // stores the current contents of the file
+    char *contents;
+
+    // get the current contents of the file
+    int result = read_file( file, contents );
+    if ( result < 0 ){
+        return E_FAILURE; // could not load file contents
+    }
+
+    // append the new stuff
+    int num_blocks =( ( file->bytes + buf_size ) / BLOCK_SIZE ) + 1;
+    char *new_contents = _km_slice_alloc( num_blocks );
+    new_contents = strcpy( new_contents, contents );
+    new_contents = strcat( new_contents, buf );
+
+    // write new contents to the disk
+    int result = save_filecontents( file->block, new_contents, num_blocks );
+
+    // check result
+    if ( result < 0 ){
+        return E_FAILURE;
+    }
+
+    // update file i-node
+    file->bytes += buf_size;
+
+    return SUCCESS;
+}
+
 /**
 ** Name:  ?
 **

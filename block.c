@@ -114,7 +114,8 @@ int load_file( int id, File *file ){
     uint16_t *buf = _km_slice_alloc( 1 );
 
     // read it from the disk
-    bool_t result = readDisk( block.device, block.startl, block.starth, NUM_SECTORS, buf );
+    bool_t result = readDisk( block.device, block.startl, block.starth,\
+    NUM_SECTORS, buf );
 
     // check result of write
     if ( !result ){
@@ -125,6 +126,61 @@ int load_file( int id, File *file ){
 
     return SUCCESS; 
 }
+
+int load_filecontents( int id, char *buf, int num_blocks ){
+    
+    // for passing in to the disk driver
+    char *buf_ptr = buf;
+
+    // go through each block
+    for( int i = id; i < id + num_blocks; i++ ){
+        
+	// get the block
+        Block block = block_list[i];
+
+	// read block from the disk
+        bool_t result = readDisk( block.device, block.startl, block.starth,\
+        NUM_SECTORS, ( uint16_t *) buf_ptr );
+        
+	// check result of write
+        if ( !result ){
+            return E_FAILURE;
+        }
+	
+	// this now points to the next part of buffer to be filled
+	buf_ptr += BLOCK_SIZE;
+    }
+
+    return SUCCESS;
+}
+
+int save_filecontents( int id, char *contents, int num_blocks ){
+    
+    // for passing in to the disk driver
+    char *buf_ptr = buf;
+
+    // go through each block
+    for( int i = id; i < id + num_blocks; i++ ){
+        
+	// get the block
+        Block block = block_list[i];
+
+	// write block to the disk
+        bool_t result = writeDisk( block.device, block.startl, block.starth,\
+        NUM_SECTORS, ( uint16_t *) buf_ptr );
+        
+	// check result of write
+        if ( !result ){
+            return E_FAILURE;
+        }
+	
+	// this now points to the next part of buffer to be written
+	buf_ptr += BLOCK_SIZE;
+    }
+
+    return SUCCESS;
+}
+
 
 /**
 ** Name:  ?

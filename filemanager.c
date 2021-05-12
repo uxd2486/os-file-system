@@ -47,6 +47,15 @@ char *get_file_name( int file_id ){
     return NULL;
 }
 
+int get_file_id( char *file_name ){
+    for ( int i = 0; i < map_count; i++ ){
+        if ( strcmp(map[i].name, file_name) == 0 ){
+            return map.id;
+	}
+    }
+    return -1;
+}
+
 /*
 ** PUBLIC FUNCTIONS
 */
@@ -214,6 +223,63 @@ int close_file( char *filename ){
 	}
     }
     open_files_count--;
+}
+
+int read_file( char *filename, char *buf ){
+    
+    // get the file id
+    int file_id = get_file_id( filename );
+    if ( file_id < 0 ){
+        return E_FAILURE; // file doesn't exist
+    }
+
+    // find the file in the open file list
+    File *file = NULL;
+    for ( int i = 0; i < open_files_count; i++ ){
+        if ( open_files[i].id == id ){
+            file = &open_files[i];
+	}
+    }
+
+    if ( file == NULL ){
+        return E_FAILURE; // file isn't in the open list
+    }
+
+    int result = read_file( file, buf);
+    if( result < 0 ){
+        return E_FAILURE; //something went wrong
+    }
+
+    return SUCCESS;
+}
+
+int write_file( char *filename, char *buf, int buf_size ){
+   
+    // get the file id
+    int file_id = get_file_id( filename );
+    if ( file_id < 0 ){
+        return E_FAILURE; // file doesn't exist
+    }
+
+    // find the file in the open file list
+    File *file = NULL;
+    for ( int i = 0; i < open_files_count; i++ ){
+        if ( open_files[i].id == id ){
+            file = &open_files[i];
+	}
+    }
+
+    if ( file == NULL ){
+        return E_FAILURE; // file isn't in the open list
+    }
+
+    int result = write_file( file, buf, buf_size );
+    if( result < 0 ){
+        return E_FAILURE; //something went wrong
+    }
+
+    return SUCCESS;
+
 }
 
 /**

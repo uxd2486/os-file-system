@@ -57,9 +57,9 @@ int load_file( int id, File *file );
 
 int save_file( int id, File *file );
 
-int load_block( int id );
+int load_filecontents( int id, char *buf, int num_blocks );
 
-int save_block( int id, void *contents );
+int save_filecontents( int id, char *contents, int num_blocks );
 
 #endif
 /* SP_ASM_SRC */

@@ -52,7 +52,7 @@ int open_file( char *filename );
 
 int close_file( char *filename );
 
-int read_file( char *filename, char *buf, int buf_size);
+int read_file( char *filename, char *buf );
 
 int write_file( char *filename, char *buf, int buf_size );
 
