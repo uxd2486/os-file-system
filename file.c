@@ -23,7 +23,15 @@
 /*
 ** PRIVATE GLOBAL VARIABLES
 */
+
+/*
+** Maps a file id to the block id its i-node is stored in
+*/
 static filemap_t *file_to_block;
+
+/*
+** Number of files
+*/
 static int file_count;
 
 /*
@@ -48,6 +56,13 @@ int get_block_id( int file_id ){
 /*
 ** PUBLIC FUNCTIONS
 */
+
+/**
+** Name:  _fl_init
+**
+** Initializes global variables and calls the block init function
+**
+*/
 void _fl_init(){
     // Initilize the globals
     file_to_block = ( filemap_t * ) _km_alloc_page( 2 );
@@ -57,7 +72,15 @@ void _fl_init(){
     _blk_init();
 }
 
-
+/**
+** Name:  _fl_create
+**
+** Creates a new file, given an id to assign to it
+**
+** @param id   The id of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fl_create( int id ){
 
     // initialize file
@@ -83,6 +106,15 @@ int _fl_create( int id ){
     return SUCCESS;
 }
 
+/**
+** Name:  _fl_open
+**
+** Opens a file so it can be used 
+**
+** @param id   The id of the file
+**
+** @return 0 if successful, -1 if not
+*/
 file_t *_fl_open( int id ){
     
     // get the block the i-node is in
@@ -101,6 +133,15 @@ file_t *_fl_open( int id ){
     return file;
 }
 
+/**
+** Name:  _fl_delete
+**
+** Deletes a file from the disk
+**
+** @param id   The id of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fl_delete( int id ){
     
     // get the block that the i-node is in
@@ -145,6 +186,15 @@ int _fl_delete( int id ){
     return SUCCESS;
 }
 
+/**
+** Name:  _fl_close
+**
+** Saves an open file to the disk
+**
+** @param file      The i-node of the file
+**
+** @return 0 if successful, -1 if not
+*/
 int _fl_close( file_t *file ){
     
     int block_id = get_block_id( file->id );
@@ -164,6 +214,16 @@ int _fl_close( file_t *file ){
     return SUCCESS;
 }
 
+/**
+** Name:  _fl_read
+**
+** Reads contents of a file to a buffer
+**
+** @param file      The i-node of the file
+** @param buf       The buffer to be written to
+**
+** @return Number of characters written to the buffer
+*/
 int _fl_read( file_t *file, char *buf){
     
     // get the number of blocks to read
@@ -190,6 +250,17 @@ int _fl_read( file_t *file, char *buf){
     return file->bytes + 1;
 }
 
+/**
+** Name:  _fl_write
+**
+** Writes contents of the buffer to a file
+**
+** @param file      The i-node of the file
+** @param buf       The buffer containing stuff to write 
+** @param buf_size  Number of characters in the buffer
+**
+** @return 0 if successful, -1 if not
+*/
 int _fl_write( file_t *file, char *buf, int buf_size ){
     
     // stores the current contents of the file
@@ -223,12 +294,3 @@ int _fl_write( file_t *file, char *buf, int buf_size ){
     return SUCCESS;
 }
 
-/**
-** Name:  ?
-**
-** ?
-**
-** @param ?    ?
-**
-** @return ?
-*/

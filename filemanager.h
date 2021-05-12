@@ -29,10 +29,10 @@
 ** Types
 */
 
-//
-// Used to store file names with
-// corresponding file ids
-//
+/*
+** Used to store file names with
+** corresponding file ids
+*/
 typedef struct str_to_int_s {
     char name[16];
     int id;
