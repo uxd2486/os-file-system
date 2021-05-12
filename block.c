@@ -3,7 +3,9 @@
 **
 ** @author Utkarsh Dayal CSCI-452 class of 20205
 **
-** File to handle block operations
+** File to handle block allocation as well as block reads and writes from 
+** the disk. This also calls functions in ahci.h to read/write sectors from 
+** the disk
 */
 
 #define	SP_KERNEL_SRC

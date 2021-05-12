@@ -3,7 +3,7 @@
 **
 ** @author Utkarsh Dayal CSCI-452 class of 20205
 **
-** Function definitions for block usage.
+** Function definitions for block allocation and block reads/writes.
 */
 
 #ifndef BLOCK_H_

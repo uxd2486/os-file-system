@@ -3,7 +3,7 @@
 **
 ** @author Utkarsh Dayal CSCI-452 class of 20205
 **
-** Function definitions for handling files and directories
+** Function definitions for tracking files and file names
 */
 
 #ifndef FILEMANAGER_H_

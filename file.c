@@ -1,10 +1,11 @@
 /**
 **
-** @file file.h
+** @file file.c
 **
 ** @author Utkarsh Dayal CSCI-452 class of 20205
 **
-** Functions for reading/writing one file 
+** Functions for reading/writing one file. This also serves as an interface
+** between filemanager and block.
 */
 
 #define	SP_KERNEL_SRC

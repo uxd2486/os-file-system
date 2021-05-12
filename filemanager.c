@@ -1,10 +1,11 @@
 /**
 **
-** @file filemanager.h
+** @file filemanager.c
 **
 ** @author Utkarsh Dayal CSCI-452 class of 20205
 **
-** Functions for handling files and directories
+** Functions for keeping track of files and file names.
+** These functions are being used by syscalls to do file system operations.
 */
 
 #define	SP_KERNEL_SRC
