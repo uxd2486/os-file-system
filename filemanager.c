@@ -35,10 +35,10 @@ static uint32_t file_id_assigner;
 static nameMap_t *map;
 
 // number of entries in the map
-static map_count;
+static int map_count;
 
 // stores i-nodes for open files which are being used
-static file_t **open_files;
+static file_t *open_files;
 
 // number of open files
 static int open_files_count;
@@ -63,7 +63,7 @@ static int open_files_count;
 char *get_file_name( int file_id ){
     for ( int i = 0; i < map_count; i++ ){
         if ( map[i].id == file_id ){
-            return map.name;
+            return map[i].name;
 	}
     }
     return NULL;
@@ -81,7 +81,7 @@ char *get_file_name( int file_id ){
 int get_file_id( char *file_name ){
     for ( int i = 0; i < map_count; i++ ){
         if ( strcmp(map[i].name, file_name) == 0 ){
-            return map.id;
+            return map[i].id;
 	}
     }
     return -1;
@@ -106,7 +106,7 @@ void _fs_init(){
     map_count = 0;
 
     // allocate list of open file i-nodes
-    open_files = ( (file_t *) * ) _km_page_alloc( 2 );
+    open_files = (file_t *)  _km_page_alloc( 2 );
     open_files_count = 0;
 
     // call the file init
@@ -146,11 +146,11 @@ int _fs_create( char *filename ){
     file_id_assigner++;
 
     // add file to filename list
-    nameMap_t *new_map = ( nameMap_t *) _km_slice_alloc( 1 );
-    new_map->id = id;
+    nameMap_t *new_map = ( nameMap_t *) _km_slice_alloc( );
+    new_map->id = file_id;
     strcpy( new_map->name, filename );
-    map[file_count] = *new_map;
-    file_count++;
+    map[map_count] = *new_map;
+    map_count++;
     _km_slice_free( new_map );
 
     return SUCCESS;
@@ -229,7 +229,7 @@ int _fs_open( char *filename ){
 
     //check if file is already open
     for ( int i = 0; i < open_files_count; i++ ){
-        file_t *file = open_files[i];
+        file_t *file = &open_files[i];
 	if ( file->id == id ){
             __cio_printf( "File '%s' is already open\n", filename );
 	    return E_FAILURE; // file is already open
@@ -243,7 +243,7 @@ int _fs_open( char *filename ){
     }
     
     // Add it to the open files list
-    open_files[open_files_count] = file;
+    open_files[open_files_count] = *file;
     open_files_count++;
 
     return SUCCESS;
@@ -302,6 +302,8 @@ int _fs_close( char *filename ){
 	}
     }
     open_files_count--;
+
+    return SUCCESS;
 }
 
 /**
@@ -324,9 +326,9 @@ int _fs_read( char *filename, char *buf ){
     }
 
     // find the file in the open file list
-    File *file = NULL;
+    file_t *file = NULL;
     for ( int i = 0; i < open_files_count; i++ ){
-        if ( open_files[i].id == id ){
+        if ( open_files[i].id == file_id ){
             file = &open_files[i];
 	}
     }
@@ -366,9 +368,9 @@ int _fs_write( char *filename, char *buf, int buf_size ){
     }
 
     // find the file in the open file list
-    File *file = NULL;
+    file_t *file = NULL;
     for ( int i = 0; i < open_files_count; i++ ){
-        if ( open_files[i].id == id ){
+        if ( open_files[i].id == file_id ){
             file = &open_files[i];
 	}
     }

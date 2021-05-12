@@ -12,6 +12,8 @@
 
 #include "common.h"
 #include "kmem.h"
+#include "file.h"
+#include "block.h"
 
 /*
 ** PRIVATE DEFINITIONS
@@ -57,8 +59,8 @@ int get_block_id( int file_id ){
     
     int block_id = -1;
     for ( int i = 0; i < file_count; i++ ){
-        if ( file_to_block[i]->file_id == file_id ){
-	    block_id = file_to_block[i]->block_id;
+        if ( file_to_block[i].file_id == file_id ){
+	    block_id = file_to_block[i].block_id;
 	    break;
 	}
     }
@@ -77,7 +79,7 @@ int get_block_id( int file_id ){
 */
 void _fl_init(){
     // Initilize the globals
-    file_to_block = ( filemap_t * ) _km_alloc_page( 2 );
+    file_to_block = ( filemap_t * ) _km_page_alloc( 2 );
     file_count = 0;
 
     // call the block init
@@ -96,15 +98,19 @@ void _fl_init(){
 int _fl_create( int id ){
 
     // initialize file
-    file_t *file = ( file_t * ) _km_slice_alloc( 1 );
+    file_t *file = ( file_t * ) _km_slice_alloc( );
     file->id = id;
     file->bytes = 0;
     file->block = _blk_alloc( NUM_BLOCKS );
 
     // alloc block to store i-node
     int file_block = _blk_alloc( 1 );
-    file_to_block[file_count] = file_block;
+    filemap_t *fl_map = _km_slice_alloc();
+    fl_map->block_id = file_block;
+    fl_map->file_id = id;
+    file_to_block[file_count] = *fl_map;
     file_count++;
+    _km_slice_free( fl_map );
 
     // save i-node to disk
     int result = _blk_save_file( file_block, file );
@@ -133,14 +139,14 @@ file_t *_fl_open( int id ){
     int block_id = get_block_id( id );
     if ( block_id == -1 ){
         __cio_printf( "File %d does not have an i-node??\n", id );
-        return E_FAILURE; // file i-node not found
+        return NULL; // file i-node not found
     }
 
     file_t *file = NULL;
     // load the file i-node from disk
     int result = _blk_load_file( block_id, file );
     if ( result < 0 || file == NULL){
-        return E_FAILURE; // something went wrong
+        return NULL; // something went wrong
     }
 
     return file;
@@ -165,6 +171,7 @@ int _fl_delete( int id ){
     }
 
     // load the file i-node from disk
+    file_t *file = NULL;
     int result = _blk_load_file( block_id, file );
     if ( result < 0 || file == NULL){
         return E_FAILURE; // something went wrong
@@ -182,7 +189,7 @@ int _fl_delete( int id ){
     // remove the file from the file_to_block
     int index = -1;
     for ( int i = 0; i < file_count; i++ ){
-        if ( file_to_block[i]->block_id == block_id ){
+        if ( file_to_block[i].block_id == block_id ){
 	    index = -1;
 	    break;
 	}
@@ -193,8 +200,8 @@ int _fl_delete( int id ){
     }
     for ( int i = index; i < file_count; i++ ){
         if ( i + 1 < file_count ){
-            file_to_block[i]->file_id = file_to_block[i+1]->file_id;
-            file_to_block[i]->block_id = file_to_block[i+1]->block_id;
+            file_to_block[i].file_id = file_to_block[i+1].file_id;
+            file_to_block[i].block_id = file_to_block[i+1].block_id;
 	}
     }
 
@@ -219,7 +226,7 @@ int _fl_close( file_t *file ){
     }
 
     // write the file i-node to the disk
-    int result = _blk_save_file( file_block, file );
+    int result = _blk_save_file( block_id, file );
     if ( result < 0 ){
         return E_FAILURE; // something went wrong
     }
@@ -245,11 +252,6 @@ int _fl_read( file_t *file, char *buf){
     // get the number of blocks to read
     int num_blocks = ( file->bytes / BLOCK_SIZE ) + \
     ( ( file->bytes % BLOCK_SIZE ) != 0 );
-
-    // allocate memory in the buffer
-    // slices and blocks are the same size so this
-    // works really well
-    buf = ( char * ) _km_slice_alloc( num_blocks );
 
     // read file contents from disk
     int result = _blk_load_filecontents( file->block, buf, num_blocks );
@@ -280,7 +282,9 @@ int _fl_read( file_t *file, char *buf){
 int _fl_write( file_t *file, char *buf, int buf_size ){
     
     // stores the current contents of the file
-    char *contents;
+    int num_pages = ( file->bytes / PAGE_SIZE ) +
+        (( file->bytes % PAGE_SIZE ) != 0);
+    char *contents = ( char * ) _km_page_alloc( num_pages );
 
     // get the current contents of the file
     int result = _fl_read( file, contents );
@@ -290,14 +294,15 @@ int _fl_write( file_t *file, char *buf, int buf_size ){
 
     // append the new stuff
     int num_bytes = file->bytes + buf_size;
-    int num_blocks = ( num_bytes / BLOCK_SIZE ) + \
-    ( ( num_bytes % BLOCK_SIZE ) != 0;
-    char *new_contents = _km_slice_alloc( num_blocks );
-    new_contents = strcpy( new_contents, contents );
-    new_contents = strcat( new_contents, buf );
+    int num_blocks = ( num_bytes / BLOCK_SIZE ) + 
+    ( ( num_bytes % BLOCK_SIZE ) != 0);
+    char *new_contents = _km_slice_alloc();
+    new_contents = __strcpy( new_contents, contents );
+    new_contents = __strcat( new_contents, buf );
 
     // write new contents to the disk
-    int result = _blk_save_filecontents( file->block, new_contents, num_blocks );
+    result = _blk_save_filecontents( file->block, new_contents, 
+    num_blocks );
 
     // check result
     if ( result < 0 ){
@@ -306,6 +311,12 @@ int _fl_write( file_t *file, char *buf, int buf_size ){
 
     // update file i-node
     file->bytes += buf_size;
+
+    // free memory
+    for( int i = 0; i < num_pages; i++ ){
+        _km_page_free( contents );
+	contents += PAGE_SIZE;
+    }
 
     return SUCCESS;
 }

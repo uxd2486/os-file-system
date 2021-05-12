@@ -72,7 +72,7 @@ void _fl_init( void );
 **
 ** @return 0 if successful, -1 if not
 */
-int _fl_create_( int id );
+int _fl_create( int id );
 
 /**
 ** Name:  _fl_open
@@ -83,7 +83,7 @@ int _fl_create_( int id );
 **
 ** @return 0 if successful, -1 if not
 */
-File *_fl_open( int id );
+file_t *_fl_open( int id );
 
 /**
 ** Name:  _fl_delete

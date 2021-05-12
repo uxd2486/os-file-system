@@ -12,6 +12,8 @@
 
 #include "common.h"
 #include "kmem.h"
+#include "block.h"
+#include "ahci.h"
 
 /*
 ** PRIVATE DEFINITIONS
@@ -81,12 +83,12 @@ void alloc_block( int index ){
 void _blk_init( void ){
     
     // get the hdd devices
-    _hddDeviceList_t list = _get_device_list();
+    hddDeviceList_t list = _get_device_list();
 
     // go through devices and count the sectors
-    int sector_count = 0
+    int sector_count = 0;
     for ( int i = 0; i < list.count; i++ ){
-        hddDevice_t device = list[i];
+        hddDevice_t device = list.devices[i];
 	sector_count += device.sector_count;
     }
 
@@ -101,10 +103,10 @@ void _blk_init( void ){
     // assign sectors to blocks
     int count = 0;
     for ( int i = 0; i < list.count; i++ ){
-        hddDevice_t device = list[i];
+        hddDevice_t device = list.devices[i];
         for ( int j = 0; j < device.sector_count; j += NUM_SECTORS ){
 	    // create the block
-	    block_t *block = ( block_t * ) _km_slice_alloc( 1 );
+	    block_t *block = ( block_t * ) _km_slice_alloc();
 	    block->id = count;
 	    block->device = (uint32_t) i;
 	    block->startl = (uint32_t) (j & 0xff);
@@ -120,10 +122,10 @@ void _blk_init( void ){
 
     // calculate size of the bitmap
     int map_mem = ( ( block_count / 32 ) + ( ( block_count % 32 ) != 0 ) * 4);
-    // calcualte number of pages for the bitmap
-    int num_pages = ( map_mem / PAGE_SIZE ) + ( ( map_mem % PAGE_SIZE ) != 0);
+    // calculate number of pages for the bitmap
+    int map_pages = ( map_mem / PAGE_SIZE ) + ( ( map_mem % PAGE_SIZE ) != 0);
     // allocate the bitmap
-    bit_map = ( uint32_t * ) _km_page_alloc( num_pages );
+    bit_map = ( uint32_t * ) _km_page_alloc( map_pages );
 }
     
 
@@ -156,7 +158,7 @@ int _blk_alloc( int num ){
     int free_blocks = 0; 
 
     // go through all the blocks
-    while ( index < block_count ){
+    while ( idx < block_count ){
     
         // check if block is allocated
         if ( !is_allocated( idx ) ){
@@ -166,7 +168,7 @@ int _blk_alloc( int num ){
 	    if ( free_blocks == block_count ){
 
 	        // index at which the consecutive blocks start
-	        int start_index = index - block_count + 1;
+	        int start_index = idx - block_count + 1;
 		// allocate the blocks
 		int count = 0;
 		while( count < block_count ){
@@ -198,17 +200,17 @@ int _blk_alloc( int num ){
 **
 ** @return 0 if successful, -1 if not
 */
-int _blk_save_file( int id, File *file ){
+int _blk_save_file( int id, file_t *file ){
     
     // get the block
     block_t block = block_list[id];
 
     // get the device
-    _hddDeviceList_t list = _get_device_list();
-    hddDevice_t device = list[block.device];
+    hddDeviceList_t list = _get_device_list();
+    hddDevice_t device = list.devices[block.device];
 
     // write it to the disk
-    bool_t result = writeDisk( device, block.startl, block.starth, NUM_SECTORS, (uint16_t *) file );
+    bool_t result = _write_disk( device, block.startl, block.starth, NUM_SECTORS, (uint16_t *) file );
 
     // check result of write
     if ( !result ){
@@ -229,19 +231,19 @@ int _blk_save_file( int id, File *file ){
 **
 ** @return 0 if successful, -1 if not
 */
-int _blk_load_file( int id, File *file ){
+int _blk_load_file( int id, file_t *file ){
     
     // get the block
     block_t block = block_list[id];
     
     // get the device
-    _hddDeviceList_t list = _get_device_list();
-    hddDevice_t device = list[block.device];
+    hddDeviceList_t list = _get_device_list();
+    hddDevice_t device = list.devices[block.device];
 
-    uint16_t *buf = _km_slice_alloc( 1 );
+    uint16_t *buf = _km_slice_alloc();
 
     // read it from the disk
-    bool_t result = readDisk( device, block.startl, block.starth,\
+    bool_t result = _read_disk( device, block.startl, block.starth,\
     NUM_SECTORS, buf );
 
     // check result of read
@@ -250,7 +252,7 @@ int _blk_load_file( int id, File *file ){
         return E_FAILURE;
     }
 
-    file = ( File *) buf;
+    file = ( file_t *) buf;
 
     return SUCCESS; 
 }
@@ -279,11 +281,11 @@ int _blk_load_filecontents( int id, char *buf, int num_blocks ){
         block_t block = block_list[i];
         
 	// get the device
-        _hddDeviceList_t list = _get_device_list();
-        hddDevice_t device = list[block.device];
+        hddDeviceList_t list = _get_device_list();
+        hddDevice_t device = list.devices[block.device];
 
 	// read block from the disk
-        bool_t result = readDisk( device, block.startl, block.starth,\
+        bool_t result = _read_disk( device, block.startl, block.starth,\
         NUM_SECTORS, ( uint16_t *) buf_ptr );
         
 	// check result of read
@@ -314,7 +316,7 @@ int _blk_load_filecontents( int id, char *buf, int num_blocks ){
 int _blk_save_filecontents( int id, char *contents, int num_blocks ){
     
     // for passing in to the disk driver
-    char *buf_ptr = buf;
+    char *buf_ptr = contents;
 
     // go through each block
     for( int i = id; i < id + num_blocks; i++ ){
@@ -323,11 +325,11 @@ int _blk_save_filecontents( int id, char *contents, int num_blocks ){
         block_t block = block_list[i];
         
 	// get the device
-        _hddDeviceList_t list = _get_device_list();
-        hddDevice_t device = list[block.device];
+        hddDeviceList_t list = _get_device_list();
+        hddDevice_t device = list.devices[block.device];
 
 	// write block to the disk
-        bool_t result = writeDisk( device, block.startl, block.starth,\
+        bool_t result = _write_disk( device, block.startl, block.starth,\
         NUM_SECTORS, ( uint16_t *) buf_ptr );
         
 	// check result of write

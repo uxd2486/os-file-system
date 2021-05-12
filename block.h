@@ -9,7 +9,7 @@
 #ifndef BLOCK_H_
 #define BLOCK_H_
 
-#include "file.h"
+typedef struct i_node_s file_t;
 
 /*
 ** General (C and/or assembly) definitions
@@ -57,7 +57,7 @@ typedef struct block_node {
 ** Initializes all the blocks in the disk
 **
 */
-void _blk_init();
+void _blk_init( void );
 
 /**
 ** Name:  _blk_alloc

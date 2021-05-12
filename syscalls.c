@@ -222,10 +222,10 @@ static void _sys_fwrite( uint32_t args[4] ) {
     char *buf = ( char * ) args[1];
 
     // third argument is length of the string(not including NULL-terminator)
-    int32_t size = ( int32_t ) args[2];
+    int32_t buf_size = ( int32_t ) args[2];
 
     // call the function in filemanager
-    int size = _fs_write( filename, buf, size );
+    int size = _fs_write( filename, buf, buf_size );
 
     // return the success value given by filemanager
     RET(_current) = size;
