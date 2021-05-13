@@ -3,7 +3,8 @@
 **
 ** @author Utkarsh Dayal CSCI-452 class of 20205
 **
-** Function definitions for reading/writing one file 
+** Function definitions for doing operations on one file. This is like an
+** interface between the file manager and the block.
 */
 
 #ifndef FILE__H_
@@ -77,11 +78,11 @@ int _fl_create( int id );
 /**
 ** Name:  _fl_open
 **
-** Opens a file so it can be used 
+** Loads a file i-node so it can be used 
 **
 ** @param id   The id of the file
 **
-** @return 0 if successful, -1 if not
+** @return the i-node
 */
 file_t *_fl_open( int id );
 
@@ -99,9 +100,9 @@ int _fl_delete( int id );
 /**
 ** Name:  _fl_close
 **
-** Saves an open file to the disk
+** Saves a file i-node to the disk
 **
-** @param file      The i-node of the file
+** @param file   The i-node of the file
 **
 ** @return 0 if successful, -1 if not
 */

@@ -82,7 +82,7 @@ void _fl_init(){
     file_to_block = ( filemap_t * ) _km_page_alloc( 2 );
     file_count = 0;
 
-    // call the block init
+    // call block init
     _blk_init();
 }
 
@@ -98,7 +98,7 @@ void _fl_init(){
 int _fl_create( int id ){
 
     // initialize file
-    file_t *file = ( file_t * ) _km_slice_alloc( );
+    file_t *file = ( file_t * ) _km_slice_alloc();
     file->id = id;
     file->bytes = 0;
     file->block = _blk_alloc( NUM_BLOCKS );
@@ -108,9 +108,10 @@ int _fl_create( int id ){
     filemap_t *fl_map = _km_slice_alloc();
     fl_map->block_id = file_block;
     fl_map->file_id = id;
+
+    // save file and block ids to the map
     file_to_block[file_count] = *fl_map;
     file_count++;
-    _km_slice_free( fl_map );
 
     // save i-node to disk
     int result = _blk_save_file( file_block, file );
@@ -119,6 +120,7 @@ int _fl_create( int id ){
     }
 
     // free memory
+    _km_slice_free( fl_map );
     _km_slice_free( file );
 
     return SUCCESS;
@@ -127,11 +129,11 @@ int _fl_create( int id ){
 /**
 ** Name:  _fl_open
 **
-** Opens a file so it can be used 
+** Loads a file i-node so it can be used 
 **
 ** @param id   The id of the file
 **
-** @return 0 if successful, -1 if not
+** @return the i-node
 */
 file_t *_fl_open( int id ){
     
@@ -186,7 +188,8 @@ int _fl_delete( int id ){
     // free the file i-node block
     _blk_free( block_id );
 
-    // remove the file from the file_to_block
+    // remove the file from the file_to_block map
+    // first find the index of the file
     int index = -1;
     for ( int i = 0; i < file_count; i++ ){
         if ( file_to_block[i].block_id == block_id ){
@@ -198,6 +201,7 @@ int _fl_delete( int id ){
         __cio_printf( "File %d does not have an i-node??\n", id );
         return E_FAILURE; // something went wrong
     }
+    // remove the file from the map
     for ( int i = index; i < file_count; i++ ){
         if ( i + 1 < file_count ){
             file_to_block[i].file_id = file_to_block[i+1].file_id;
@@ -211,9 +215,9 @@ int _fl_delete( int id ){
 /**
 ** Name:  _fl_close
 **
-** Saves an open file to the disk
+** Saves a file i-node to the disk
 **
-** @param file      The i-node of the file
+** @param file   The i-node of the file
 **
 ** @return 0 if successful, -1 if not
 */
@@ -281,7 +285,7 @@ int _fl_read( file_t *file, char *buf){
 */
 int _fl_write( file_t *file, char *buf, int buf_size ){
     
-    // stores the current contents of the file
+    // make buffer to store the current contents of the file
     int num_pages = ( file->bytes / PAGE_SIZE ) +
         (( file->bytes % PAGE_SIZE ) != 0);
     char *contents = ( char * ) _km_page_alloc( num_pages );
@@ -292,11 +296,13 @@ int _fl_write( file_t *file, char *buf, int buf_size ){
         return E_FAILURE; // could not load file contents
     }
 
-    // append the new stuff
+    // make a new buffer that can hold the combined contents
     int num_bytes = file->bytes + buf_size;
     int num_blocks = ( num_bytes / BLOCK_SIZE ) + 
     ( ( num_bytes % BLOCK_SIZE ) != 0);
     char *new_contents = _km_slice_alloc();
+
+    // append the new contents to the old in the new buffer
     new_contents = __strcpy( new_contents, contents );
     new_contents = __strcat( new_contents, buf );
 

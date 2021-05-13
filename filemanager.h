@@ -3,7 +3,7 @@
 **
 ** @author Utkarsh Dayal CSCI-452 class of 20205
 **
-** Function definitions for tracking files and file names
+** Function definitions for the file system, to be used by syscall handlers.
 */
 
 #ifndef FILEMANAGER_H_
@@ -30,7 +30,7 @@
 */
 
 /*
-** Used to store file names with
+** Used to match file names with
 ** corresponding file ids
 */
 typedef struct str_to_int_s {
@@ -49,14 +49,15 @@ typedef struct str_to_int_s {
 /**
 ** Name:    _fs_init
 **
-** Initializes the file system
+** Initializes the file system by initializing globals. Also calls
+** _fl_init.
 */
 void _fs_init( void );
 
 /**
 ** Name:    _fs_create
 **
-** Creates a new file in the file system with the given name
+** Creates a new file in the file system with the given name.
 **
 ** @param filename  The name of the file
 **
@@ -67,7 +68,7 @@ int _fs_create( char *filename );
 /**
 ** Name:    _fs_delete
 **
-** Deletes a file in the file system with the given name
+** Deletes a file in the file system with the given name.
 **
 ** @param filename  The name of the file
 **
@@ -78,7 +79,8 @@ int _fs_delete( char *filename );
 /**
 ** Name:    _fs_open
 **
-** Opens a file in the file system so it can be used
+** Opens a file in the file system so it can be used. This is basically
+** just loading up the file i-node from the disk.
 **
 ** @param filename  The name of the file
 **
@@ -89,7 +91,8 @@ int _fs_open( char *filename );
 /**
 ** Name:    _fs_close
 **
-** Closes a file in the file system after it has been used
+** Closes a file in the file system after it has been used. This involves
+** saving the file i-node back to the disk.
 **
 ** @param filename  The name of the file
 **
@@ -100,7 +103,7 @@ int _fs_close( char *filename );
 /**
 ** Name:    _fs_read
 **
-** Reads from a file in the file system with the given name
+** Reads from a file in the file system with the given name.
 **
 ** @param filename  The name of the file
 ** @param buf       The buffer to be filled with the file contents
@@ -112,7 +115,7 @@ int _fs_read( char *filename, char *buf );
 /**
 ** Name:    _fs_write
 **
-** Writes to a file in the file system with the given name
+** Writes to a file in the file system with the given name.
 **
 ** @param filename  The name of the file
 ** @param buf       Buffer containing what's to be written
