@@ -1,0 +1,14 @@
+To enable the output shown during the demo uncomment lines 540-551 in ahci.c.
+This assumes at least one sata ata (not atapi) drive is connected to the system.
+
+To run the demo or just the regular driver a drive can be created with:
+	qemu-img create <filename> <size, eg:20M>
+
+Then to run the OS with the drive on QEMU use:
+	qemu-system-x86_64 <OS image file> -drive id=disk,file=<disk filename>,if=none -device ahci,id=ahci -device ide-drive,drive=disk,bus=ahci.0
+
+To create a bootable flash drive use:
+	sudo dd of=/dev/<flash drive> if=<OS image file> bs=4M status=progress conv=fdatasync
+
+
+A couple changes were made after the demo that do not affect the functionality of the demo. The first change was to the identify data structure in ahci.h. All instances of uint32_t's were changed to arrays of uint16_t's. Then in ahci.c the drive size checking code at 503-535 was changed to accomodate the structure change.

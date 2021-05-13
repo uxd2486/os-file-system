@@ -1,0 +1,4 @@
+The file system requires the HDD Driver to work, so the above instructions can be used to run it as well. 
+
+One thing to note is that at the moment no file system functionality is being used by any part of the system. If you want to use the file system you would have to create or modify one of the user/main routines present in users.h/c and userland.
+Syscalls for all file system functionality can be found in syscalls.h, and if a user is created as described above it can use those syscalls to run the file system.
