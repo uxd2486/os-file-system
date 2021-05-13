@@ -3,9 +3,8 @@
 **
 ** @author Utkarsh Dayal CSCI-452 class of 20205
 **
-** File to handle block allocation as well as block reads and writes from 
-** the disk. This also calls functions in ahci.h to read/write sectors from 
-** the disk
+** File to handle block allocation via bitmap. This also calls
+** functions in ahci.h to read/write sectors from the disk.
 */
 
 #define	SP_KERNEL_SRC
@@ -102,8 +101,11 @@ void _blk_init( void ){
 
     // assign sectors to blocks
     int count = 0;
+    // iterate through the devices
     for ( int i = 0; i < list.count; i++ ){
         hddDevice_t device = list.devices[i];
+
+	// iterate through the sectors in each device
         for ( int j = 0; j < device.sector_count; j += NUM_SECTORS ){
 	    // create the block
 	    block_t *block = ( block_t * ) _km_slice_alloc();
@@ -114,6 +116,7 @@ void _blk_init( void ){
 
 	    // put the block in the list
 	    block_list[count] = *block;
+	    count++;
 
 	    // free the memory used
 	    _km_slice_free( block );
@@ -132,7 +135,7 @@ void _blk_init( void ){
 /**
 ** Name:  _blk_free
 **
-** Frees a single disk blocks using the bit-map, given the id
+** Frees a single disk block using the bit-map, given the id
 **
 ** @param index    The id of the block to be freed
 **

@@ -3,12 +3,15 @@
 **
 ** @author Utkarsh Dayal CSCI-452 class of 20205
 **
-** Function definitions for block allocation and block reads/writes.
+** Function definitions for block allocation and block reads/writes. Block is
+** also responsible for communcation with the SATA driver.
 */
 
 #ifndef BLOCK_H_
 #define BLOCK_H_
 
+// this is to avoid recursive #include statements
+// now the compiler knows that file_t exists without including file.h
 typedef struct i_node_s file_t;
 
 /*
@@ -54,7 +57,8 @@ typedef struct block_node {
 /**
 ** Name:  _blk_init
 **
-** Initializes all the blocks in the disk
+** Initializes all the blocks in the disk and assigns sectors to them. The 
+** bitmap is also initialized here.
 **
 */
 void _blk_init( void );
@@ -62,7 +66,7 @@ void _blk_init( void );
 /**
 ** Name:  _blk_alloc
 **
-** Allocates a given number of continous disk blocks using the bit-map
+** Allocates a given number of continous disk blocks
 **
 ** @param num    The number of disk blocks to be allocated
 **
@@ -73,7 +77,7 @@ int _blk_alloc( int num );
 /**
 ** Name:  _blk_free
 **
-** Frees a single disk blocks using the bit-map, given the id
+** Frees a single disk block, given the id
 **
 ** @param index    The id of the block to be freed
 **
@@ -95,7 +99,7 @@ int _blk_load_file( int id, file_t *file );
 /**
 ** Name:  _blk_save_file
 **
-** Given the i-node of a file and the block it, saves it to the disk
+** Given the i-node of a file and the block id, saves it to the disk
 **
 ** @param id          The id of the i-node block of the file
 ** @param file        Pointer where i-node needs to is stored

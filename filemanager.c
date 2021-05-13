@@ -6,6 +6,8 @@
 **
 ** Functions for keeping track of files and file names.
 ** These functions are being used by syscalls to do file system operations.
+** The file manager essentially looks up the filename, finds the id of the 
+** file, and then calls the corresponding function in file to do the operation.
 */
 
 #define	SP_KERNEL_SRC
@@ -95,7 +97,8 @@ int get_file_id( char *file_name ){
 /**
 ** Name:    _fs_init
 **
-** Initializes the file system
+** Initializes the file system. This involves initializing globals and
+** then calling _fl_init.
 */
 void _fs_init(){
 
@@ -210,7 +213,7 @@ int _fs_delete( char *filename ){
 /**
 ** Name:    _fs_open
 **
-** Opens a file in the file system so it can be used
+** Opens a file in the file system so it can be used. 
 **
 ** @param filename  The name of the file
 **
